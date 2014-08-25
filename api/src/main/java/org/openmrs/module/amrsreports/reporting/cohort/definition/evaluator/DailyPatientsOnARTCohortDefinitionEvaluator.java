@@ -21,7 +21,7 @@ import java.util.Set;
 /**
  * Evaluator for patients with recent encounters or have future appointment dates
  */
-@Handler(supports = {NewEnrollmentsCohortDefinition.class})
+@Handler(supports = {DailyPatientsOnARTCohortDefinition.class})
 public class DailyPatientsOnARTCohortDefinitionEvaluator implements CohortDefinitionEvaluator {
 
 
@@ -30,39 +30,39 @@ public class DailyPatientsOnARTCohortDefinitionEvaluator implements CohortDefini
     @Override
     public EvaluatedCohort evaluate(CohortDefinition cohortDefinition, EvaluationContext context) throws EvaluationException {
 
-        NewEnrollmentsCohortDefinition definition = (NewEnrollmentsCohortDefinition) cohortDefinition;
+        DailyPatientsOnARTCohortDefinition definition = (DailyPatientsOnARTCohortDefinition) cohortDefinition;
 
         if (definition == null)
             return null;
 
-        Cohort newEnrollments = new Cohort();
+        Cohort onCare = new Cohort();
 
-        PatientsOnADayCohortDefinition allPatients = new PatientsOnADayCohortDefinition();
-        RevisitsCohortDefinition revisits = new RevisitsCohortDefinition();
+        OnARTCohortDefinition onART = new OnARTCohortDefinition();
+        PatientsOnADayCohortDefinition all = new PatientsOnADayCohortDefinition();
 
         //add params
-        allPatients.addParameter(new Parameter("startDate", "Report Date", Date.class));
-        allPatients.addParameter(new Parameter("endDate", "End Reporting Date", Date.class));
+        all.addParameter(new Parameter("startDate", "Report Date", Date.class));
+        all.addParameter(new Parameter("endDate", "End Reporting Date", Date.class));
 
-        revisits.addParameter(new Parameter("startDate", "Report Date", Date.class));
-        revisits.addParameter(new Parameter("endDate", "End Reporting Date", Date.class));
+        onART.addParameter(new Parameter("startDate", "Report Date", Date.class));
+        onART.addParameter(new Parameter("endDate", "End Reporting Date", Date.class));
 
         context.addParameterValue("startDate", context.getParameterValue("startDate"));
         context.addParameterValue("endDate", context.getParameterValue("endDate"));
 
-        Cohort all = Context.getService(CohortDefinitionService.class).evaluate(allPatients, context);
-        Cohort revisitPatients = Context.getService(CohortDefinitionService.class).evaluate(revisits, context);
+        Cohort allPatients = Context.getService(CohortDefinitionService.class).evaluate(all, context);
+        Cohort onArtPatients = Context.getService(CohortDefinitionService.class).evaluate(onART, context);
 
         Set<Integer> finalMembers = new HashSet<Integer>();
 
-        for(Integer id:all.getMemberIds()){
-            if(!revisitPatients.getMemberIds().contains(id)){
+        for(Integer id:allPatients.getMemberIds()){
+            if(onArtPatients.getMemberIds().contains(id)){
                 finalMembers.add(id);
             }
         }
 
-        newEnrollments.setMemberIds(finalMembers);
+        onCare.setMemberIds(finalMembers);
 
-        return new EvaluatedCohort(newEnrollments, cohortDefinition, context);
+        return new EvaluatedCohort(onCare, cohortDefinition, context);
     }
 }

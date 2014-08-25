@@ -6,6 +6,7 @@ import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferIN12CohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferOUT24CohortDefinition;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
@@ -17,7 +18,7 @@ import org.openmrs.module.reporting.evaluation.EvaluationException;
 /**
  * Evaluator for Dead Patients Cohort Definition
  */
-@Handler(supports = {TransferIN12CohortDefinition.class})
+@Handler(supports = {TransferOUT24CohortDefinition.class})
 public class TransferOUT24CohortDefinitionEvaluator implements CohortDefinitionEvaluator {
 
 
@@ -26,7 +27,7 @@ public class TransferOUT24CohortDefinitionEvaluator implements CohortDefinitionE
     @Override
     public EvaluatedCohort evaluate(CohortDefinition cohortDefinition, EvaluationContext context) throws EvaluationException {
 
-        TransferIN12CohortDefinition definition = (TransferIN12CohortDefinition) cohortDefinition;
+        TransferOUT24CohortDefinition definition = (TransferOUT24CohortDefinition) cohortDefinition;
 
         if (definition == null)
             return null;
@@ -41,8 +42,8 @@ public class TransferOUT24CohortDefinitionEvaluator implements CohortDefinitionE
         String sql =
                 "select o.person_id from person p   " +
                         "    inner join obs o using(person_id)   " +
-                        "    where o.concept_id=160534   " +
-                        "    and value_datetime > (:startDate) and value_datetime <= date_add((:startDate),INTERVAL 12 MONTH)";
+                        "    where o.concept_id=160649   " +
+                        "    and value_datetime > date_add((:startDate),INTERVAL 12 MONTH) and value_datetime <= date_add((:startDate),INTERVAL 24 MONTH)";
 
         SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition(sql);
         Cohort results = Context.getService(CohortDefinitionService.class).evaluate(sqlCohortDefinition, context);

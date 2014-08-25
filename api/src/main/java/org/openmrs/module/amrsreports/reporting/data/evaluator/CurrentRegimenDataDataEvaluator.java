@@ -13,34 +13,24 @@
  */
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
-import org.openmrs.PersonAttribute;
-import org.openmrs.PersonAttributeType;
 import org.openmrs.annotation.Handler;
-import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.AmrsReportsConstants;
-import org.openmrs.module.amrsreports.model.PatientTBTreatmentData;
-import org.openmrs.module.amrsreports.reporting.data.TbTreatmentStartDateDataDefinition;
+import org.openmrs.module.amrsreports.model.RegimenObject;
+import org.openmrs.module.amrsreports.reporting.data.CurrentRegimenDataDefinition;
 import org.openmrs.module.amrsreports.service.MohCoreService;
 import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
-import org.openmrs.module.reporting.data.person.definition.PersonAttributeDataDefinition;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.data.person.evaluator.PersonDataEvaluator;
-import org.openmrs.module.reporting.data.person.service.PersonDataService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
+
 
 /**
  */
-@Handler(supports = TbTreatmentStartDateDataDefinition.class, order = 50)
+@Handler(supports = CurrentRegimenDataDefinition.class, order = 50)
 public class CurrentRegimenDataDataEvaluator implements PersonDataEvaluator {
 
 	/**
@@ -60,106 +50,73 @@ public class CurrentRegimenDataDataEvaluator implements PersonDataEvaluator {
 
 		Map<String, Object> m = new HashMap<String, Object>();
 		m.put("personIds", context.getBaseCohort());
+        m.put("startDate", context.getParameterValue("startDate"));
+        m.put("endDate", context.getParameterValue("endDate"));
 
-		String sql = "select person_id, " +
-				" CASE " +
-				"     WHEN (concept_id=1113) THEN value_datetime" +
-				"     WHEN (concept_id=1268 and value_coded=1256)  THEN obs_datetime " +
-				" END" +
-				" start_date" +
-				" from obs  " +
-				" 	  where" +
-				"		person_id in (:personIds)" +
-				"		and concept_id in (1113,1268)" +
-				"		and voided = 0";
+        /*context.addParameterValue("startDate", context.getParameterValue("startDate"));
+        context.addParameterValue("endDate", context.getParameterValue("endDate"));*/
+        
+        String sql = "SELECT o.patient_id, rg.name, rg.regimen_type, max(o.date_created)    " +
+                "     from orders o    " +
+                "     inner join drug_order do using(order_id)    " +
+                "     inner join drug d on do.drug_inventory_id = d.drug_id    " +
+                "     inner join cpad_regimen_drug rd using(drug_id)    " +
+                "     inner join cpad_regimen rg using(regimen_id) "     +
+                "     where o.date_created between (:startDate) and (:endDate)"+
+                "     and o.patient_id in (:personIds) " +
+                "     and o.voided = 0 " +
+                "     group by o.patient_id having max(o.date_created)";
 
-		ListMap<Integer, Date> mappedStartDates = makeDatesMapFromSQL(sql, m);
+		ListMap<Integer, RegimenObject> currentRegimen = makeRegimensMapFromSQL(sql, m);
 
-        /*get tb registration number for patients*/
-		String typeId = Context.getAdministrationService().getGlobalProperty(AmrsReportsConstants.TB_REGISTRATION_NO_ATTRIBUTE_TYPE);
-		PersonAttributeType pat;
 
-		try {
-			pat = Context.getPersonService().getPersonAttributeType(Integer.valueOf(typeId));
-		} catch (NumberFormatException e) {
-			pat = Context.getPersonService().getPersonAttributeType(AmrsReportsConstants.TB_REGISTRATION_NO_ATTRIBUTE_TYPE_DEFAULT);
-		}
-
-		if (pat == null) {
-			throw new APIException("Could not find TB Registration Number Person Attribute.");
-		}
-
-		PersonAttributeDataDefinition patientTBRegistrationDetails = new PersonAttributeDataDefinition(pat);
-
-		EvaluatedPersonData tbRegData = Context.getService(PersonDataService.class).evaluate(patientTBRegistrationDetails, context);
-
-		Map<Integer, Object> regDetails = null;
-		Set<Date> startDates = null;
-
-		if (tbRegData.getData() != null)
-			regDetails = tbRegData.getData();
 
 		for (Integer memberId : context.getBaseCohort().getMemberIds()) {
 
-			PatientTBTreatmentData details = new PatientTBTreatmentData();
-
-			if (!mappedStartDates.isEmpty()) {
-				startDates = safeFind(mappedStartDates, memberId);
-			}
-
-			String tbRegistrationNo = null;
-			if (regDetails != null) {
-				Object regNoObj = regDetails.get(memberId);
-				if (regNoObj != null) {
-					PersonAttribute pa = (PersonAttribute) regNoObj;
-					tbRegistrationNo = pa.getValue();
-				}
-			}
-			details.setTbRegNO(tbRegistrationNo);
-
-			if (startDates.size() > 0)
-				details.setEvaluationDates(startDates);
-
-            /*Add findings to the list*/
-
-			data.addData(memberId, details);
+			data.addData(memberId, safeFind(currentRegimen, memberId));
 		}
 
 		return data;
 	}
 
-	protected Set<Date> safeFind(final ListMap<Integer, Date> map, final Integer key) {
-		Set<Date> dateSet = new TreeSet<Date>();
+	protected RegimenObject safeFind(final ListMap<Integer, RegimenObject> map, final Integer key) {
+		RegimenObject regimen = new RegimenObject();
 		if (map.size() > 0 && map.containsKey(key))
-			dateSet.addAll(map.get(key));
-		return dateSet;
+			return (RegimenObject) map.get(key);
+
+		return regimen;
 	}
 
 	/**
 	 * executes sql query and generates a ListMap<Integer, Date>
 	 */
-	protected ListMap<Integer, Date> makeDatesMapFromSQL(String sql, Map<String, Object> substitutions) {
+	protected ListMap<Integer, RegimenObject> makeRegimensMapFromSQL(String sql, Map<String, Object> substitutions) {
 		List<Object> data = Context.getService(MohCoreService.class).executeSqlQuery(sql, substitutions);
-		return makeDatesMap(data);
+		return makeRegimensMap(data);
 	}
 
 	/**
 	 * generates a map of integers to lists of dates, assuming this is the kind of response expected from the SQL
 	 */
-	protected ListMap<Integer, Date> makeDatesMap(List<Object> data) {
-		ListMap<Integer, Date> dateListMap = new ListMap<Integer, Date>();
+	protected ListMap<Integer, RegimenObject> makeRegimensMap(List<Object> data) {
+		ListMap<Integer, RegimenObject> regimensListMap = new ListMap<Integer, RegimenObject>();
 		for (Object o : data) {
 			Object[] parts = (Object[]) o;
-			if (parts.length == 2) {
+			if (parts.length == 4) {
+
 				Integer pId = (Integer) parts[0];
-				Date date = (Date) parts[1];
-				if (pId != null && date != null) {
-					dateListMap.putInList(pId, date);
+				String regimenName = (String) parts[1];
+                String regimenType = (String) parts[2];
+				if (pId != null && regimenName != null) {
+                    RegimenObject regimen = new RegimenObject();
+                    regimen.setRegimenName(regimenName);
+                    regimen.setRegimenType(regimenType);
+					regimensListMap.putInList(pId, regimen);
 				}
 			}
 		}
 
-		return dateListMap;
+		return regimensListMap;
 	}
 
 }

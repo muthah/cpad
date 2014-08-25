@@ -5,7 +5,10 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.reporting.cohort.definition.*;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.NewEnrollmentsCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.PatientsOnADayCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.PatientsWithRevisitsCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.RevisitsCohortDefinition;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.evaluator.CohortDefinitionEvaluator;
@@ -21,7 +24,7 @@ import java.util.Set;
 /**
  * Evaluator for patients with recent encounters or have future appointment dates
  */
-@Handler(supports = {NewEnrollmentsCohortDefinition.class})
+@Handler(supports = {PatientsWithRevisitsCohortDefinition.class})
 public class PatientsWithRevisitsCohortDefinitionEvaluator implements CohortDefinitionEvaluator {
 
 
@@ -30,7 +33,7 @@ public class PatientsWithRevisitsCohortDefinitionEvaluator implements CohortDefi
     @Override
     public EvaluatedCohort evaluate(CohortDefinition cohortDefinition, EvaluationContext context) throws EvaluationException {
 
-        NewEnrollmentsCohortDefinition definition = (NewEnrollmentsCohortDefinition) cohortDefinition;
+        PatientsWithRevisitsCohortDefinition definition = (PatientsWithRevisitsCohortDefinition) cohortDefinition;
 
         if (definition == null)
             return null;
@@ -56,7 +59,7 @@ public class PatientsWithRevisitsCohortDefinitionEvaluator implements CohortDefi
         Set<Integer> finalMembers = new HashSet<Integer>();
 
         for(Integer id:all.getMemberIds()){
-            if(!revisitPatients.getMemberIds().contains(id)){
+            if(revisitPatients.getMemberIds().contains(id)){
                 finalMembers.add(id);
             }
         }

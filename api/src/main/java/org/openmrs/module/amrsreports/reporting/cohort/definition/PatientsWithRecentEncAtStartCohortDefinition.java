@@ -8,7 +8,7 @@ import org.openmrs.module.reporting.evaluation.caching.Caching;
  * MOH 361B Register cohort definition
  */
 @Caching(strategy = ConfigurationPropertyCachingStrategy.class)
-@Localized("reporting.PatientsWithRecentEncCohortDefinition")
+@Localized("reporting.PatientsWithRecentEncAtStartCohortDefinition")
 public class PatientsWithRecentEncAtStartCohortDefinition extends AMRSReportsCohortDefinition {
 
 }

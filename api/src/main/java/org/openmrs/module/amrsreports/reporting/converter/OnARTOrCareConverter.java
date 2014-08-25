@@ -10,21 +10,22 @@ import org.openmrs.module.reporting.data.converter.DataConverter;
 public class OnARTOrCareConverter implements DataConverter {
 	@Override
 	public Object convert(Object original) {
-		Encounter e = (Encounter) original;
+		String e = (String) original;
 
 		if (e == null)
 			return null;
+        String response = e.equals("Yes")?"ART":"Care";
 
-		return e.getLocation();
+		return response;
 	}
 
 	@Override
 	public Class<?> getInputDataType() {
-		return Encounter.class;
+		return String.class;
 	}
 
 	@Override
 	public Class<?> getDataType() {
-		return Location.class;
+		return String.class;
 	}
 }

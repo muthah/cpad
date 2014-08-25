@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.PatientsWithRecentEncAt36CohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.PatientsWithRecentEncAtStartCohortDefinition;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -17,7 +18,7 @@ import org.openmrs.module.reporting.evaluation.EvaluationException;
 /**
  * Evaluator for patients with recent encounters or have future appointment dates
  */
-@Handler(supports = {PatientsWithRecentEncAtStartCohortDefinition.class})
+@Handler(supports = {PatientsWithRecentEncAt36CohortDefinition.class})
 public class PatientsWithRecentEncAt36CohortDefinitionEvaluator implements CohortDefinitionEvaluator {
 
 
@@ -26,7 +27,7 @@ public class PatientsWithRecentEncAt36CohortDefinitionEvaluator implements Cohor
     @Override
     public EvaluatedCohort evaluate(CohortDefinition cohortDefinition, EvaluationContext context) throws EvaluationException {
 
-        PatientsWithRecentEncAtStartCohortDefinition definition = (PatientsWithRecentEncAtStartCohortDefinition) cohortDefinition;
+        PatientsWithRecentEncAt36CohortDefinition definition = (PatientsWithRecentEncAt36CohortDefinition) cohortDefinition;
 
         if (definition == null)
             return null;

@@ -60,7 +60,8 @@
 
 <%@ include file="localHeader.jsp" %>
 
-<a href="queuedReport.form">Add a Scheduled Report</a>
+<a href="queuedReport.form">Add a Scheduled Report</a> &nbsp;&nbsp;||&nbsp;&nbsp;
+<a href="queuedParametizedReport.form">Add Patient Management Report</a>
 
 <br/>
 

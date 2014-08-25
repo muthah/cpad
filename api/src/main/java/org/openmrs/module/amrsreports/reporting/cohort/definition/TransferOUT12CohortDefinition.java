@@ -9,7 +9,7 @@ import org.openmrs.module.reporting.evaluation.caching.Caching;
  * Transfer In cohort Definition
  */
 @Caching(strategy = ConfigurationPropertyCachingStrategy.class)
-@Localized("reporting.TransferIN12CohortDefinition")
+@Localized("reporting.TransferOUT12CohortDefinition")
 public class TransferOUT12CohortDefinition extends BaseCohortDefinition {
 
 }

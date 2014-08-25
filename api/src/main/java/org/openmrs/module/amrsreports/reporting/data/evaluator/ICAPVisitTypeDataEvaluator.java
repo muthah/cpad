@@ -54,23 +54,16 @@ public class ICAPVisitTypeDataEvaluator implements PersonDataEvaluator {
 		DataSetQueryService qs = Context.getService(DataSetQueryService.class);
 		Map<String, Object> m = new HashMap<String, Object>();
 
+        String sql = "select v.patient_id, v.visit_type_id from visit v    " +
+                "    inner join encounter e using(visit_id)    " +
+                "    where e.encounter_datetime = (:startDate) " +
+                "		and v.patient_id  in (:patientIds) " ;
 
-
-        String sql = "select person_id, value_coded " +
-                " 	from obs" +
-                " 	where" +
-                "		person_id in (:patientIds)" +
-                "   	and concept_id = 160530" +
-                "		and voided = 0" +
-                "		and obs_datetime between (:startDate) and (:endDate) " +
-                "       group by person_id "+
-                "       having max(obs_datetime) " ;
 
 
         if (context.getBaseCohort() != null) {
 			m.put("patientIds", context.getBaseCohort());
             m.put("startDate", context.getParameterValue("startDate"));
-            m.put("endDate", context.getParameterValue("endDate"));
 		}
 
 

@@ -4,14 +4,11 @@ import org.apache.commons.io.IOUtils;
 import org.openmrs.Location;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.LFTUCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.converter.DateListCustomConverter;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.converter.ICAPTBStatusConverter;
-import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.ICAPCCCNoDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.ICAPEnrollmentDateDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.ICAPLastAppointmentDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.ICAPTBStatusDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.*;
 import org.openmrs.module.amrsreports.util.MOHReportUtil;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
@@ -63,9 +60,12 @@ public class LFTUReportProvider extends ReportProvider {
         dsd.addColumn("name", new PreferredNameDataDefinition(), nullString, new ObjectFormatter());
         dsd.addColumn("enrollmentDate", new ICAPEnrollmentDateDataDefinition(), nullString,new DateListCustomConverter("yyyy-MM-dd"));
         dsd.addColumn("tbstatus", new ICAPTBStatusDataDefinition(), nullString,new ICAPTBStatusConverter());
+        dsd.addColumn("telephone", new ICAPPatientTelephoneDataDefinition(), nullString);
+        dsd.addColumn("supporter", new ICAPSupporterNameDataDefinition(), nullString);
+        dsd.addColumn("supporterTelephone", new ICAPSupporterTelephoneDataDefinition(), nullString);
         dsd.addColumn("cohort", new ICAPEnrollmentDateDataDefinition(), nullString,new DateListCustomConverter("MM-yyyy"));
 
-		report.addDataSetDefinition(dsd,null);
+        report.addDataSetDefinition(dsd,null);
 
 		return report;
 	}
@@ -73,25 +73,8 @@ public class LFTUReportProvider extends ReportProvider {
 	@Override
 	public CohortDefinition getCohortDefinition() {
 
-        String sql ="select obs.person_id from obs  " +
-                "   inner join person p  " +
-                "   on p.person_id=obs.person_id   " +
-                "   where concept_id=160555  " +
-                "   and location_id in (:locationList)  " +
-                "   and obs.person_id not in ( select person_id from person where dead=1 ) " +
-                "   and obs.person_id not in ( select person_id from obs where concept_id in (1543,160649) and value_datetime between (:startDate) and (:endDate) ) " +
-                "   and obs.person_id not in ( select o.person_id from obs o where concept_id = 5096 and value_datetime between (:startDate) and (:endDate) ) " +
-                "   and obs.person_id not in ( select e.patient_id from encounter e group by e.patient_id having max(e.encounter_datetime) between date_add((:endDate),INTERVAL -93 DAY) and (:endDate) ) " +
-                "   and value_datetime between (:startDate) and (:endDate) ";
+        return new LFTUCohortDefinition();
 
-
-        CohortDefinition generalCOhort = new SqlCohortDefinition(sql);
-        generalCOhort.setName("LTFU and Unknown");
-
-        generalCOhort.addParameter(new Parameter("startDate", "Report Date", Date.class));
-        generalCOhort.addParameter(new Parameter("endDate", "End Reporting Date", Date.class));
-        generalCOhort.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-        return generalCOhort;
 	}
 
 	@Override

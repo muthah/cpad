@@ -415,6 +415,8 @@ public class QueuedReportServiceImpl implements QueuedReportService {
         }*/
         }  catch (Exception e){
             queuedReport.setStatus(QueuedReport.STATUS_ERROR);
+            e.printStackTrace();
+            log.error(e);
             throw new RuntimeException("There was a problem running this report!!!!");
             //Context.getService(QueuedReportService.class).saveQueuedReport(queuedReport);
             //log.info(e.getCause());

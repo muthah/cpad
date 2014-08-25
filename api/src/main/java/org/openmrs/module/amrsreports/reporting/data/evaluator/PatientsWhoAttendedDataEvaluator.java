@@ -16,7 +16,10 @@ package org.openmrs.module.amrsreports.reporting.data.evaluator;
 import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.AttendedPatientsCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.BookedPatientsCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.OnARTCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.data.AttendedStatusDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.PatientOnARTDataDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
@@ -26,12 +29,13 @@ import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 
-import java.util.*;
+import java.util.Date;
+import java.util.Set;
 
 /**
  * Evaluates an ObsForPersonDataDefinition to produce a PersonData
  */
-@Handler(supports = PatientOnARTDataDefinition.class, order = 50)
+@Handler(supports = AttendedStatusDataDefinition.class, order = 50)
 public class PatientsWhoAttendedDataEvaluator implements PersonDataEvaluator {
 
 
@@ -42,30 +46,31 @@ public class PatientsWhoAttendedDataEvaluator implements PersonDataEvaluator {
 	public EvaluatedPersonData evaluate(PersonDataDefinition definition, EvaluationContext context) throws EvaluationException {
 
 
-		EvaluatedPersonData c = new EvaluatedPersonData(definition, context);
+        EvaluatedPersonData c = new EvaluatedPersonData(definition, context);
 
-		if (context.getBaseCohort() != null && context.getBaseCohort().isEmpty()) {
-			return c;
-		}
+        if (context.getBaseCohort() != null && context.getBaseCohort().isEmpty()) {
+            return c;
+        }
 
-        OnARTCohortDefinition onART = new OnARTCohortDefinition();
+        AttendedPatientsCohortDefinition attended = new AttendedPatientsCohortDefinition();
 
         //add params
-        onART.addParameter(new Parameter("startDate", "Report Date", Date.class));
+        attended.addParameter(new Parameter("startDate", "Report Date", Date.class));
+        attended.addParameter(new Parameter("endDate", "End Reporting Date", Date.class));
 
         context.addParameterValue("startDate", context.getParameterValue("startDate"));
         context.addParameterValue("endDate", context.getParameterValue("endDate"));
 
-        Cohort onArtPatients = Context.getService(CohortDefinitionService.class).evaluate(onART, context);
-        Set<Integer> patientsOnART = onArtPatients.getMemberIds();
+        Cohort patientsAttended = Context.getService(CohortDefinitionService.class).evaluate(attended, context);
+        Set<Integer> patientsWhoAttended= patientsAttended.getMemberIds();
 
         for (Integer memberId : context.getBaseCohort().getMemberIds()) {
-            String isTrue =  patientsOnART.contains(memberId)?"Yes":"No";
+            String isTrue =  patientsWhoAttended.contains(memberId)?"Yes":"No";
 
             c.addData(memberId, isTrue);
         }
 
-		return c;
+        return c;
 	}
 
 }

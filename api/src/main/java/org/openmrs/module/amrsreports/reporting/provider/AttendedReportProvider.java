@@ -8,6 +8,7 @@ import org.openmrs.module.amrsreports.reporting.converter.ICAPVisitTypeConverter
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ICAPCCCNoDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ICAPVisitTypeDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.PatientOnARTDataDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.common.SortCriteria;
@@ -70,7 +71,8 @@ public class AttendedReportProvider extends ReportProvider {
 		dsd.addColumn("name", new PreferredNameDataDefinition(), nullString, new ObjectFormatter());
 		dsd.addColumn("sex", new GenderDataDefinition(), nullString);
 
-		AgeAtEvaluationDateDataDefinition add = new AgeAtEvaluationDateDataDefinition();
+
+        AgeAtEvaluationDateDataDefinition add = new AgeAtEvaluationDateDataDefinition();
 		dsd.addColumn("age", add, nullString, new DecimalAgeConverter(0));
 
         ICAPVisitTypeDataDefinition type = new ICAPVisitTypeDataDefinition();
@@ -81,7 +83,14 @@ public class AttendedReportProvider extends ReportProvider {
 
         dsd.addColumn("visit", type, periodMappings, new ICAPVisitTypeConverter());
 
-		report.addDataSetDefinition(dsd,periodMappings);
+        PatientOnARTDataDefinition art = new PatientOnARTDataDefinition();
+        art.addParameter(new Parameter("startDate", "Report Date", Date.class));
+        art.addParameter(new Parameter("endDate", "End Reporting Date", Date.class));
+        art.addParameter(new Parameter("locationList", "List of Locations", Location.class));
+        dsd.addColumn("onART", art,periodMappings);
+
+
+        report.addDataSetDefinition(dsd,periodMappings);
 
 		return report;
 	}
@@ -94,7 +103,7 @@ public class AttendedReportProvider extends ReportProvider {
                 "  on p.person_id=e.patient_id   " +
                 "    where e.voided = 0  " +
                 "    and p.voided=0   " +
-                "    and e.encounter_datetime between (:startDate) and (:endDate)  " +
+                "    and e.encounter_datetime = (:startDate)  " +
                 "    and e.location_id in ( :locationList ) ";
 
         CohortDefinition generalCOhort = new SqlCohortDefinition(sql);

@@ -145,7 +145,6 @@ public class ICAPMOH361AReportProvider extends ReportProvider {
         dsd.addColumn("Last HIV Encounter Location", lastHIVEncounter, nullString,
                 new PropertyConverter(EncounterRepresentation.class, "locationName"));
 
-
         ICAPAgeAtEnrollmentDateDataDefinition ageAtEnrollmentIcap = new ICAPAgeAtEnrollmentDateDataDefinition();
 
         MappedData<ICAPAgeAtEnrollmentDateDataDefinition> mappedDef = new MappedData<ICAPAgeAtEnrollmentDateDataDefinition>();

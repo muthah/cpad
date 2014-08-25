@@ -6,6 +6,7 @@ import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.DeadPatientsCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.DeadPatientsStartCohortDefinition;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
@@ -17,7 +18,7 @@ import org.openmrs.module.reporting.evaluation.EvaluationException;
 /**
  * Evaluator for Dead Patients Cohort Definition
  */
-@Handler(supports = {DeadPatientsCohortDefinition.class})
+@Handler(supports = {DeadPatientsStartCohortDefinition.class})
 public class DeadPatientsStartCohortDefinitionEvaluator implements CohortDefinitionEvaluator {
 
 
@@ -26,7 +27,7 @@ public class DeadPatientsStartCohortDefinitionEvaluator implements CohortDefinit
     @Override
     public EvaluatedCohort evaluate(CohortDefinition cohortDefinition, EvaluationContext context) throws EvaluationException {
 
-        DeadPatientsCohortDefinition definition = (DeadPatientsCohortDefinition) cohortDefinition;
+        DeadPatientsStartCohortDefinition definition = (DeadPatientsStartCohortDefinition) cohortDefinition;
 
         if (definition == null)
             return null;
@@ -38,12 +39,12 @@ public class DeadPatientsStartCohortDefinitionEvaluator implements CohortDefinit
                 "select person_id from person   " +
                         " where dead = 1   " +
                         " and death_date is not null   " +
-                        " and death_date between (:startDate) and (:endDate)   " +
+                        " and death_date = (:startDate)   " +
                         " union   " +
                         "    (select person_id from obs   " +
                         "     where concept_id = 1543   " +
                         "     and value_datetime is not null  " +
-                        "     and value_datetime between (:startDate) and (:endDate)  " +
+                        "     and value_datetime = (:startDate)  " +
                         "    )";
 
 

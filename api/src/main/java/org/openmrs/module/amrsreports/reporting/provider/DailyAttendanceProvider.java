@@ -3,8 +3,7 @@ package org.openmrs.module.amrsreports.reporting.provider;
 import org.apache.commons.io.IOUtils;
 import org.openmrs.Location;
 import org.openmrs.api.APIException;
-import org.openmrs.module.amrsreports.reporting.AttendanceIndicatorLibrary;
-import org.openmrs.module.amrsreports.reporting.PWPIndicatorLibrary;
+import org.openmrs.module.amrsreports.reporting.*;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.CCCPatientCohortDefinition;
 import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -29,7 +28,8 @@ import java.util.Map;
  */
 public class DailyAttendanceProvider extends ReportProvider {
 
-    private AttendanceIndicatorLibrary baseIndicator= new AttendanceIndicatorLibrary();
+    private MOH731IndicatorLibrary indicatorLibrary = new MOH731IndicatorLibrary();
+    private DailySummariesCohortLibrary cohortLibrary = new DailySummariesCohortLibrary();
 
 	public DailyAttendanceProvider() {
 		this.name = "Daily Attendance Summaries";
@@ -60,15 +60,22 @@ public class DailyAttendanceProvider extends ReportProvider {
         dsd.addParameter(facility);
 
 
-        dsd.addColumn("M-01", "Males Below 15", new Mapped<CohortIndicator>(baseIndicator.malesBelow15NewEnrollment(), periodMappings), "");
-        dsd.addColumn("M-02", "Males 15 or more", new Mapped<CohortIndicator>(baseIndicator.malesAbove15NewEnrollment(), periodMappings), "");
-        dsd.addColumn("F-01", "Females Below 15", new Mapped<CohortIndicator>(baseIndicator.femalesBelow15NewEnrollment(), periodMappings), "");
-        dsd.addColumn("F-02", "Females 15 or more", new Mapped<CohortIndicator>(baseIndicator.femalesAbove15NewEnrollment(), periodMappings), "");
+        dsd.addColumn("M-01", "Males Below 15", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("New Males below 15",cohortLibrary.malesAgedAtMostXNewEnrollments(14)), periodMappings), "");
+        dsd.addColumn("M-02", "Males 15 or more", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("Males 15 and above",cohortLibrary.malesAgedAtLeastXNewEnrollments(15)), periodMappings), "");
+        dsd.addColumn("F-01", "Females Below 15", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("Females below 15",cohortLibrary.femalesAgedAtMostXNewEnrollments(14)), periodMappings), "");
+        dsd.addColumn("F-02", "Females 15 or more", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("Males 15 and above",cohortLibrary.femalesAgedAtLeastXNewEnrollments(15)), periodMappings), "");
 
-        dsd.addColumn("M-03", "Males Below 15", new Mapped<CohortIndicator>(baseIndicator.malesBelow15WithRevisits(), periodMappings), "");
-        dsd.addColumn("M-04", "Males 15 or more", new Mapped<CohortIndicator>(baseIndicator.malesBelow15WithRevisits(), periodMappings), "");
-        dsd.addColumn("F-03", "Females Below 15", new Mapped<CohortIndicator>(baseIndicator.femalesBelow15WithRevisits(), periodMappings), "");
-        dsd.addColumn("F-04", "Females 15 or more", new Mapped<CohortIndicator>(baseIndicator.femalesBelow15WithRevisits(), periodMappings), "");
+        dsd.addColumn("M-03", "Males Below 15", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("New Males below 15",cohortLibrary.malesAgedAtMostXRevisits(14)), periodMappings), "");
+        dsd.addColumn("M-04", "Males 15 or more", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("Males 15 and above",cohortLibrary.malesAgedAtLeastXRevisits(15)), periodMappings), "");
+        dsd.addColumn("F-03", "Females Below 15", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("Females below 15",cohortLibrary.femalesAgedAtMostXRevisits(14)), periodMappings), "");
+        dsd.addColumn("F-04", "Females 15 or more", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("Males 15 and above",cohortLibrary.femalesAgedAtLeastXRevisits(15)), periodMappings), "");
+
+
+        dsd.addColumn("M-05", "Males Below 15", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("New Males below 15",cohortLibrary.patientsAgedAtMostXOnCare(14)), periodMappings), "");
+        dsd.addColumn("M-06", "Males 15 or more", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("Males 15 and above",cohortLibrary.patientsAgedAtLeastXOnCare(15)), periodMappings), "");
+        dsd.addColumn("F-05", "Females Below 15", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("Females below 15",cohortLibrary.patientsAgedAtMostXOnART(14)), periodMappings), "");
+        dsd.addColumn("F-06", "Females 15 or more", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("Males 15 and above",cohortLibrary.patientsAgedAtLeastXOnART(15)), periodMappings), "");
+
 
         report.addDataSetDefinition(dsd, periodMappings);
 

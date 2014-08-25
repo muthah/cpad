@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.BookedPatientsCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.DeadPatientsCohortDefinition;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -17,7 +18,7 @@ import org.openmrs.module.reporting.evaluation.EvaluationException;
 /**
  * Evaluator for Dead Patients Cohort Definition
  */
-@Handler(supports = {DeadPatientsCohortDefinition.class})
+@Handler(supports = {BookedPatientsCohortDefinition.class})
 public class BookedPatientsCohortDefinitionEvaluator implements CohortDefinitionEvaluator {
 
 
@@ -26,7 +27,7 @@ public class BookedPatientsCohortDefinitionEvaluator implements CohortDefinition
     @Override
     public EvaluatedCohort evaluate(CohortDefinition cohortDefinition, EvaluationContext context) throws EvaluationException {
 
-        DeadPatientsCohortDefinition definition = (DeadPatientsCohortDefinition) cohortDefinition;
+        BookedPatientsCohortDefinition definition = (BookedPatientsCohortDefinition) cohortDefinition;
 
         if (definition == null)
             return null;
@@ -34,17 +35,14 @@ public class BookedPatientsCohortDefinitionEvaluator implements CohortDefinition
 		context.addParameterValue("startDate", context.getParameterValue("startDate"));
         context.addParameterValue("endDate", context.getParameterValue("endDate"));
 
-        String sql =
-                "select person_id from person   " +
-                        " where dead = 1   " +
-                        " and death_date is not null   " +
-                        " and death_date between (:startDate) and (:endDate)   " +
-                        " union   " +
-                        "    (select person_id from obs   " +
-                        "     where concept_id = 1543   " +
-                        "     and value_datetime is not null  " +
-                        "     and value_datetime between (:startDate) and (:endDate)  " +
-                        "    )";
+        String sql ="select  o.person_id  " +
+                "  from obs o  " +
+                "  inner join person p  " +
+                "  on p.person_id=o.person_id   " +
+                "    where o.voided = 0  " +
+                "    and p.voided=0   " +
+                "    and o.concept_id = 5096 and value_datetime between date_add((:startDate),INTERVAL -1 DAY) and date_add((:startDate),INTERVAL 1 DAY)  ";
+
 
 
 

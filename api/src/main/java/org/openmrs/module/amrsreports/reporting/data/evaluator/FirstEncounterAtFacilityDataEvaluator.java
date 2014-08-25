@@ -40,11 +40,11 @@ public class FirstEncounterAtFacilityDataEvaluator extends DrugStartStopDataEval
         if (context.getBaseCohort().isEmpty())
             return data;
 
-        String hql = "select patientId, min(nullif(encounterDatetime,'0000-00-00 00:00:00')) " +
+        String hql = "select patient.patientId, min(nullif(encounterDatetime,'0000-00-00 00:00:00')) " +
                 "	from Encounter" +
                 " 	where voided = false " +
-                "   	and patientId in (:patientIds)" +
-                "   	GROUP BY patientId " ;
+                "   	and patient.patientId in (:patientIds)" +
+                "   	GROUP BY patient.patientId " ;
 
         Map<String, Object> m = new HashMap<String, Object>();
         m.put("patientIds", context.getBaseCohort());

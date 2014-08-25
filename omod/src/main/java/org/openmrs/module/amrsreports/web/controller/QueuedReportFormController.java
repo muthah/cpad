@@ -1,15 +1,12 @@
 package org.openmrs.module.amrsreports.web.controller;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.AmrsReportsConstants;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.QueuedReport;
 import org.openmrs.module.amrsreports.reporting.provider.ReportProvider;
-import org.openmrs.module.amrsreports.service.MOHFacilityService;
 import org.openmrs.module.amrsreports.service.QueuedReportService;
 import org.openmrs.module.amrsreports.service.ReportProviderRegistrar;
 import org.openmrs.module.amrsreports.service.UserFacilityService;
@@ -21,19 +18,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.text.ParseException;
+import javax.validation.Valid;
 import java.text.SimpleDateFormat;
-
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -76,10 +66,15 @@ public class QueuedReportFormController {
 
 	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedReport.form")
 	public String processForm(HttpServletRequest request,
-							  @ModelAttribute("queuedReports") QueuedReport editedReport,
+							  @Valid @ModelAttribute("queuedReports") QueuedReport editedReport,
 							  BindingResult errors,
 							  @RequestParam(value = "repeatIntervalUnits", required = false) String repeatIntervalUnits
 	) throws Exception {
+
+        if (errors.hasErrors()) {
+            log.info("Errors were encountered at binding");
+            return FORM_VIEW;
+        }
 
         HttpSession httpSession = request.getSession();
         QueuedReportService queuedReportService = Context.getService(QueuedReportService.class);

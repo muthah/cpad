@@ -47,7 +47,7 @@ public class ICAPCCCNoDataEvaluator implements PersonDataEvaluator {
 				"	from PatientIdentifier" +
 				" 	where voided = false" +
 				"   	and patient.patientId in (:patientIds)" +
-				"   	and identifierType.patientIdentifierTypeId = 3 ";
+				"   	and identifierType.patientIdentifierTypeId = 2 ";
 
 		Map<String, Object> m = new HashMap<String, Object>();
 		m.put("patientIds", context.getBaseCohort());

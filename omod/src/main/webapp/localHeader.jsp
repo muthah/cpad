@@ -40,12 +40,6 @@
                 </a>
             </li>
         </openmrs:hasPrivilege>
-        <li <c:if test='<%= request.getRequestURI().contains("cohortCounts") %>'>class="active"</c:if>>
-            <a href="${pageContext.request.contextPath}/module/amrsreports/cohortCounts.list">
-                View Cohort Counts
-            </a>
-        </li>
-
 
 </ul>
 

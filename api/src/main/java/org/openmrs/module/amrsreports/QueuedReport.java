@@ -1,7 +1,9 @@
 package org.openmrs.module.amrsreports;
 
+import org.omg.CosNaming.NamingContextPackage.NotEmpty;
 import org.openmrs.BaseOpenmrsObject;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -11,6 +13,8 @@ public class QueuedReport extends BaseOpenmrsObject {
 
 	private Integer queuedReportId;
 	private String reportName;
+
+    @NotNull
 	private MOHFacility facility;
 	private Date evaluationDate = new Date();
 	private Date dateScheduled = new Date();

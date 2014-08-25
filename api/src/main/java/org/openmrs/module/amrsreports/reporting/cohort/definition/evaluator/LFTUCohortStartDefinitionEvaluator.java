@@ -6,11 +6,16 @@ import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.DeadPatientsCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.DeadPatientsStartCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.EnrolledInCareCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.LFTUCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.LFTUStartCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.PatientsWithRecentEncAtStartCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.PatientsWithRecentEncCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferINCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferINStartCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferOUTCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferOUTStartCohortDefinition;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.evaluator.CohortDefinitionEvaluator;
@@ -26,7 +31,7 @@ import java.util.Set;
 /**
  * Evaluator for Dead Patients Cohort Definition
  */
-@Handler(supports = {LFTUCohortDefinition.class})
+@Handler(supports = {LFTUStartCohortDefinition.class})
 public class LFTUCohortStartDefinitionEvaluator implements CohortDefinitionEvaluator {
     /**
      * LFTU = Enrolled + TI - (dead + To + recent visits + future appointments )
@@ -38,7 +43,7 @@ public class LFTUCohortStartDefinitionEvaluator implements CohortDefinitionEvalu
     @Override
     public EvaluatedCohort evaluate(CohortDefinition cohortDefinition, EvaluationContext context) throws EvaluationException {
 
-        LFTUCohortDefinition definition = (LFTUCohortDefinition) cohortDefinition;
+        LFTUStartCohortDefinition definition = (LFTUStartCohortDefinition) cohortDefinition;
 
         if (definition == null)
             return null;
@@ -46,10 +51,10 @@ public class LFTUCohortStartDefinitionEvaluator implements CohortDefinitionEvalu
         Cohort lftu = new Cohort();
 
         EnrolledInCareCohortDefinition enrolled = new EnrolledInCareCohortDefinition();
-        TransferINCohortDefinition ti = new TransferINCohortDefinition();
-        TransferOUTCohortDefinition to = new TransferOUTCohortDefinition();
-        DeadPatientsCohortDefinition dead = new DeadPatientsCohortDefinition();
-        PatientsWithRecentEncCohortDefinition recentVisits = new PatientsWithRecentEncCohortDefinition();
+        TransferINStartCohortDefinition ti = new TransferINStartCohortDefinition();
+        TransferOUTStartCohortDefinition to = new TransferOUTStartCohortDefinition();
+        DeadPatientsStartCohortDefinition dead = new DeadPatientsStartCohortDefinition();
+        PatientsWithRecentEncAtStartCohortDefinition recentVisits = new PatientsWithRecentEncAtStartCohortDefinition();
 
         //add params
         enrolled.addParameter(new Parameter("startDate", "Report Date", Date.class));

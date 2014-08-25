@@ -20,6 +20,7 @@ import org.openmrs.module.amrsreports.reporting.cohort.definition.CD4LessThan350
 import org.openmrs.module.amrsreports.reporting.cohort.definition.OnARTCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.PregnantCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.data.PregnantAndOnARTCD4Below350DataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.PregnantNotOnARTCD4Below350DataDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
@@ -34,7 +35,7 @@ import java.util.Set;
 /**
  * Evaluates an ObsForPersonDataDefinition to produce a PersonData
  */
-@Handler(supports = PregnantAndOnARTCD4Below350DataDefinition.class, order = 50)
+@Handler(supports = PregnantNotOnARTCD4Below350DataDefinition.class, order = 50)
 public class PregnantNotOnARTCD4Below350DataEvaluator implements PersonDataEvaluator {
 
 
@@ -81,7 +82,7 @@ public class PregnantNotOnARTCD4Below350DataEvaluator implements PersonDataEvalu
         for (Integer memberId : context.getBaseCohort().getMemberIds()) {
             String isTrue =  "No";
 
-            if(pregnantPatientIds.contains(memberId) && patientsOnART.contains(memberId) && artCD4Below350Patients.contains(memberId)){
+            if(pregnantPatientIds.contains(memberId) && !patientsOnART.contains(memberId) && artCD4Below350Patients.contains(memberId)){
                   isTrue = "Yes";
             }
 

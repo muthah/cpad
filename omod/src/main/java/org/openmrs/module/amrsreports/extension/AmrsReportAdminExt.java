@@ -37,7 +37,6 @@ public class AmrsReportAdminExt extends AdministrationSectionExt {
 
         map.put("module/amrsreports/queuedReport.list", "Manage ICAP Reports");
         map.put("module/amrsreports/facility.list", "Manage ICAP Facilities");
-        map.put("/module/amrsreports/cohortCounts.list", "View Cohort Counts");
 
         return map;
     }

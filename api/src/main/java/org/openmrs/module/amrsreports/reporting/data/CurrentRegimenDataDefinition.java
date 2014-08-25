@@ -1,5 +1,6 @@
 package org.openmrs.module.amrsreports.reporting.data;
 
+import org.openmrs.module.amrsreports.model.RegimenObject;
 import org.openmrs.module.amrsreports.model.SortedObsFromDate;
 import org.openmrs.module.reporting.data.BaseDataDefinition;
 import org.openmrs.module.reporting.data.MappedData;
@@ -14,28 +15,8 @@ import org.openmrs.module.reporting.evaluation.caching.Caching;
 @Caching(strategy = ConfigurationPropertyCachingStrategy.class)
 public class CurrentRegimenDataDefinition extends BaseDataDefinition implements PersonDataDefinition {
 
-	@ConfigurationProperty(required = false)
-	private MappedData<? extends PersonDataDefinition> effectiveDateDefinition;
-
-	/**
-	 * @see org.openmrs.module.reporting.data.DataDefinition#getDataType()
-	 */
-	public Class<?> getDataType() {
-		return SortedObsFromDate.class;
-	}
-
-	/**
-	 * @return the effectiveDateDefinition
-	 */
-	public MappedData<? extends PersonDataDefinition> getEffectiveDateDefinition() {
-		return effectiveDateDefinition;
-	}
-
-	/**
-	 * @param effectiveDateDefinition the effectiveDateDefinition to set
-	 */
-	public void setEffectiveDateDefinition(MappedData<? extends PersonDataDefinition> effectiveDateDefinition) {
-		this.effectiveDateDefinition = effectiveDateDefinition;
-	}
-
+    @Override
+    public Class<?> getDataType() {
+        return RegimenObject.class;
+    }
 }

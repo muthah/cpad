@@ -15,11 +15,7 @@
 package org.openmrs.module.amrsreports.reporting;
 
 import org.openmrs.Location;
-import org.openmrs.module.amrsreports.reporting.cohort.definition.CurrentlyInCareCohortDefinition;
-import org.openmrs.module.amrsreports.reporting.cohort.definition.CurrentlyOnARTCohortDefinition;
-import org.openmrs.module.amrsreports.reporting.cohort.definition.PatientsWithRecentEncCohortDefinition;
-import org.openmrs.module.amrsreports.reporting.cohort.definition.DeadPatientsCohortDefinition;
-import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferOUTCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.*;
 import org.openmrs.module.reporting.cohort.definition.AgeCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
@@ -43,8 +39,9 @@ public class DailySummariesCohortLibrary {
      * Patients currently enrolled in care
      */
 
-    //-------------------------------------------------------------------------------------------------------------------------------------------------------
-    public CohortDefinition infantsCurrentlyInCare() {
+
+
+    public CohortDefinition femalesAgedAtLeastXNewEnrollments(Integer minAge) {
         CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
         cd.setName("females aged at least Some age");
@@ -52,32 +49,7 @@ public class DailySummariesCohortLibrary {
         cd.addParameter(new Parameter("endDate", "End Date", Date.class));
         cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
 
-        CurrentlyInCareCohortDefinition cohortDefinition = new CurrentlyInCareCohortDefinition();
-        cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-        cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-
-        AgeCohortDefinition ageCohortDefinition = new AgeCohortDefinition();
-        ageCohortDefinition.setMaxAgeUnit(DurationUnit.MONTHS);
-        ageCohortDefinition.setMaxAge(11);
-        ageCohortDefinition.addParameter(new Parameter("effectiveDate", "Effective Date", Date.class));
-
-        cd.addSearch("agedCohort", ReportUtils.<CohortDefinition>map(ageCohortDefinition, "effectiveDate=${endDate}"));
-        cd.addSearch("sqlCohort", ReportUtils.<CohortDefinition>map(cohortDefinition, "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        cd.setCompositionString("agedCohort AND sqlCohort");
-        return cd;
-    }
-
-
-    public CohortDefinition femalesAgedAtLeastXCurrentlyInCare(Integer minAge) {
-        CompositionCohortDefinition cd = new CompositionCohortDefinition();
-
-        cd.setName("females aged at least Some age");
-        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-        cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-
-        CurrentlyInCareCohortDefinition cohortDefinition = new CurrentlyInCareCohortDefinition();
+        NewEnrollmentsCohortDefinition cohortDefinition = new NewEnrollmentsCohortDefinition();
         cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
         cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
         cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
@@ -89,7 +61,7 @@ public class DailySummariesCohortLibrary {
         return cd;
     }
 
-    public CohortDefinition malesAgedAtLeastXCurrentlyInCare(Integer minAge) {
+    public CohortDefinition malesAgedAtLeastXNewEnrollments(Integer minAge) {
         CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
         cd.setName("males aged at least Some age");
@@ -97,7 +69,7 @@ public class DailySummariesCohortLibrary {
         cd.addParameter(new Parameter("endDate", "End Date", Date.class));
         cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
 
-        CurrentlyInCareCohortDefinition cohortDefinition = new CurrentlyInCareCohortDefinition();
+        NewEnrollmentsCohortDefinition cohortDefinition = new NewEnrollmentsCohortDefinition();
         cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
         cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
         cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
@@ -109,7 +81,7 @@ public class DailySummariesCohortLibrary {
         return cd;
     }
 
-    public CohortDefinition femalesAgedAtMostXCurrentlyInCare(Integer maxAge) {
+    public CohortDefinition femalesAgedAtMostXNewEnrollments(Integer maxAge) {
         CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
         cd.setName("females aged at least Some age");
@@ -117,7 +89,7 @@ public class DailySummariesCohortLibrary {
         cd.addParameter(new Parameter("endDate", "End Date", Date.class));
         cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
 
-        CurrentlyInCareCohortDefinition cohortDefinition = new CurrentlyInCareCohortDefinition();
+        NewEnrollmentsCohortDefinition cohortDefinition = new NewEnrollmentsCohortDefinition();
         cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
         cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
         cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
@@ -129,7 +101,7 @@ public class DailySummariesCohortLibrary {
         return cd;
     }
 
-    public CohortDefinition malesAgedAtMostXCurrentlyInCare(Integer maxAge) {
+    public CohortDefinition malesAgedAtMostXNewEnrollments(Integer maxAge) {
         CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
         cd.setName("males aged at least Some age");
@@ -137,7 +109,7 @@ public class DailySummariesCohortLibrary {
         cd.addParameter(new Parameter("endDate", "End Date", Date.class));
         cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
 
-        CurrentlyInCareCohortDefinition cohortDefinition = new CurrentlyInCareCohortDefinition();
+        NewEnrollmentsCohortDefinition cohortDefinition = new NewEnrollmentsCohortDefinition();
         cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
         cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
         cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
@@ -153,11 +125,14 @@ public class DailySummariesCohortLibrary {
   //===================================================================================================
 
     /**
-     * Patients currently enrolled on ART
+     * Revisits
      */
 
     //-------------------------------------------------------------------------------------------------------------------------------------------------------
-    public CohortDefinition infantsCurrentlyOnART() {
+
+
+
+    public CohortDefinition femalesAgedAtLeastXRevisits(Integer minAge) {
         CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
         cd.setName("females aged at least Some age");
@@ -165,32 +140,7 @@ public class DailySummariesCohortLibrary {
         cd.addParameter(new Parameter("endDate", "End Date", Date.class));
         cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
 
-        CurrentlyOnARTCohortDefinition cohortDefinition = new CurrentlyOnARTCohortDefinition();
-        cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-        cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-
-        AgeCohortDefinition ageCohortDefinition = new AgeCohortDefinition();
-        ageCohortDefinition.setMaxAgeUnit(DurationUnit.MONTHS);
-        ageCohortDefinition.setMaxAge(11);
-        ageCohortDefinition.addParameter(new Parameter("effectiveDate", "Effective Date", Date.class));
-
-        cd.addSearch("agedCohort", ReportUtils.<CohortDefinition>map(ageCohortDefinition, "effectiveDate=${endDate}"));
-        cd.addSearch("sqlCohort", ReportUtils.<CohortDefinition>map(cohortDefinition, "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        cd.setCompositionString("agedCohort AND sqlCohort");
-        return cd;
-    }
-
-
-    public CohortDefinition femalesAgedAtLeastXCurrentlyOnART(Integer minAge) {
-        CompositionCohortDefinition cd = new CompositionCohortDefinition();
-
-        cd.setName("females aged at least Some age");
-        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-        cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-
-        CurrentlyOnARTCohortDefinition cohortDefinition = new CurrentlyOnARTCohortDefinition();
+        PatientsWithRevisitsCohortDefinition cohortDefinition = new PatientsWithRevisitsCohortDefinition();
         cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
         cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
         cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
@@ -202,7 +152,7 @@ public class DailySummariesCohortLibrary {
         return cd;
     }
 
-    public CohortDefinition malesAgedAtLeastXCurrentlyOnART(Integer minAge) {
+    public CohortDefinition malesAgedAtLeastXRevisits(Integer minAge) {
         CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
         cd.setName("males aged at least Some age");
@@ -210,7 +160,7 @@ public class DailySummariesCohortLibrary {
         cd.addParameter(new Parameter("endDate", "End Date", Date.class));
         cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
 
-        CurrentlyOnARTCohortDefinition cohortDefinition = new CurrentlyOnARTCohortDefinition();
+        PatientsWithRevisitsCohortDefinition cohortDefinition = new PatientsWithRevisitsCohortDefinition();
         cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
         cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
         cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
@@ -222,7 +172,7 @@ public class DailySummariesCohortLibrary {
         return cd;
     }
 
-    public CohortDefinition femalesAgedAtMostXCurrentlyOnART(Integer maxAge) {
+    public CohortDefinition femalesAgedAtMostXRevisits(Integer maxAge) {
         CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
         cd.setName("females aged at least Some age");
@@ -230,7 +180,7 @@ public class DailySummariesCohortLibrary {
         cd.addParameter(new Parameter("endDate", "End Date", Date.class));
         cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
 
-        CurrentlyOnARTCohortDefinition cohortDefinition = new CurrentlyOnARTCohortDefinition();
+        PatientsWithRevisitsCohortDefinition cohortDefinition = new PatientsWithRevisitsCohortDefinition();
         cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
         cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
         cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
@@ -242,7 +192,7 @@ public class DailySummariesCohortLibrary {
         return cd;
     }
 
-    public CohortDefinition malesAgedAtMostXCurrentlyOnART(Integer maxAge) {
+    public CohortDefinition malesAgedAtMostXRevisits(Integer maxAge) {
         CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
         cd.setName("males aged at least Some age");
@@ -250,7 +200,7 @@ public class DailySummariesCohortLibrary {
         cd.addParameter(new Parameter("endDate", "End Date", Date.class));
         cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
 
-        CurrentlyOnARTCohortDefinition cohortDefinition = new CurrentlyOnARTCohortDefinition();
+        PatientsWithRevisitsCohortDefinition cohortDefinition = new PatientsWithRevisitsCohortDefinition();
         cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
         cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
         cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
@@ -265,95 +215,17 @@ public class DailySummariesCohortLibrary {
 
 //===========================================================================================================
 
-	/*
-	* Transfers
-	*
-	* */
+    //===================================================================================================
 
-    public CohortDefinition femalesAtLeastTransfers(Integer minAge) {
-        CompositionCohortDefinition cd = new CompositionCohortDefinition();
-
-        cd.setName("females aged at least Some age");
-        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-        cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-
-        TransferOUTCohortDefinition cohortDefinition = new TransferOUTCohortDefinition();
-        cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-        cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-
-        cd.addSearch("females", ReportUtils.map(commonCohortLibrary.females()));
-        cd.addSearch("agedAtLeastSomeAge", ReportUtils.map(commonCohortLibrary.agedAtLeast(minAge), "effectiveDate=${endDate}"));
-        cd.addSearch("sqlCohort", ReportUtils.<CohortDefinition>map(cohortDefinition, "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        cd.setCompositionString("females AND agedAtLeastSomeAge AND sqlCohort");
-        return cd;
-    }
-
-    public CohortDefinition femalesAtMostTransfers(Integer maxAge) {
-        CompositionCohortDefinition cd = new CompositionCohortDefinition();
-
-        cd.setName("females aged at least Some age");
-        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-        cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-
-        TransferOUTCohortDefinition cohortDefinition = new TransferOUTCohortDefinition();
-        cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-        cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-
-        cd.addSearch("females", ReportUtils.map(commonCohortLibrary.females()));
-        cd.addSearch("agedAtLeastSomeAge", ReportUtils.map(commonCohortLibrary.agedAtMost(maxAge), "effectiveDate=${endDate}"));
-        cd.addSearch("sqlCohort", ReportUtils.<CohortDefinition>map(cohortDefinition, "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        cd.setCompositionString("females AND agedAtLeastSomeAge AND sqlCohort");
-        return cd;
-    }
-
-
-    public CohortDefinition malesAtLeastTransfers(Integer minAge) {
-        CompositionCohortDefinition cd = new CompositionCohortDefinition();
-
-        cd.setName("males aged at least Some age");
-        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-        cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-
-        TransferOUTCohortDefinition cohortDefinition = new TransferOUTCohortDefinition();
-        cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-        cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-
-        cd.addSearch("males", ReportUtils.map(commonCohortLibrary.males()));
-        cd.addSearch("agedAtLeastSomeAge", ReportUtils.map(commonCohortLibrary.agedAtLeast(minAge), "effectiveDate=${endDate}"));
-        cd.addSearch("sqlCohort", ReportUtils.<CohortDefinition>map(cohortDefinition, "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        cd.setCompositionString("males AND agedAtLeastSomeAge AND sqlCohort");
-        return cd;
-    }
-
-    public CohortDefinition malesAtMostTransfers(Integer maxAge) {
-        CompositionCohortDefinition cd = new CompositionCohortDefinition();
-
-        cd.setName("males aged at least Some age");
-        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-        cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-
-        TransferOUTCohortDefinition cohortDefinition = new TransferOUTCohortDefinition();
-        cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-        cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-
-        cd.addSearch("males", ReportUtils.map(commonCohortLibrary.males()));
-        cd.addSearch("agedAtLeastSomeAge", ReportUtils.map(commonCohortLibrary.agedAtMost(maxAge), "effectiveDate=${endDate}"));
-        cd.addSearch("sqlCohort", ReportUtils.<CohortDefinition>map(cohortDefinition, "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        cd.setCompositionString("males AND agedAtLeastSomeAge AND sqlCohort");
-        return cd;
-    }
+    /**
+     * on Care
+     */
 
     //-------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    public CohortDefinition femalesAgedAtLeastXActive(Integer minAge) {
+
+
+    public CohortDefinition femalesAgedAtLeastXOnCare(Integer minAge) {
         CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
         cd.setName("females aged at least Some age");
@@ -361,7 +233,7 @@ public class DailySummariesCohortLibrary {
         cd.addParameter(new Parameter("endDate", "End Date", Date.class));
         cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
 
-        PatientsWithRecentEncCohortDefinition cohortDefinition = new PatientsWithRecentEncCohortDefinition();
+        DailyPatientsOnCareCohortDefinition cohortDefinition = new DailyPatientsOnCareCohortDefinition();
         cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
         cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
         cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
@@ -373,7 +245,7 @@ public class DailySummariesCohortLibrary {
         return cd;
     }
 
-    public CohortDefinition malesAgedAtLeastXActive(Integer minAge) {
+    public CohortDefinition malesAgedAtLeastXOnCare(Integer minAge) {
         CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
         cd.setName("males aged at least Some age");
@@ -381,7 +253,7 @@ public class DailySummariesCohortLibrary {
         cd.addParameter(new Parameter("endDate", "End Date", Date.class));
         cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
 
-        PatientsWithRecentEncCohortDefinition cohortDefinition = new PatientsWithRecentEncCohortDefinition();
+        DailyPatientsOnCareCohortDefinition cohortDefinition = new DailyPatientsOnCareCohortDefinition();
         cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
         cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
         cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
@@ -393,7 +265,7 @@ public class DailySummariesCohortLibrary {
         return cd;
     }
 
-    public CohortDefinition femalesAgedAtMostXActive(Integer maxAge) {
+    public CohortDefinition femalesAgedAtMostXOnCare(Integer maxAge) {
         CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
         cd.setName("females aged at least Some age");
@@ -401,7 +273,7 @@ public class DailySummariesCohortLibrary {
         cd.addParameter(new Parameter("endDate", "End Date", Date.class));
         cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
 
-        PatientsWithRecentEncCohortDefinition cohortDefinition = new PatientsWithRecentEncCohortDefinition();
+        DailyPatientsOnCareCohortDefinition cohortDefinition = new DailyPatientsOnCareCohortDefinition();
         cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
         cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
         cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
@@ -413,7 +285,7 @@ public class DailySummariesCohortLibrary {
         return cd;
     }
 
-    public CohortDefinition malesAgedAtMostXActive(Integer maxAge) {
+    public CohortDefinition malesAgedAtMostXOnCare(Integer maxAge) {
         CompositionCohortDefinition cd = new CompositionCohortDefinition();
 
         cd.setName("males aged at least Some age");
@@ -421,89 +293,7 @@ public class DailySummariesCohortLibrary {
         cd.addParameter(new Parameter("endDate", "End Date", Date.class));
         cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
 
-        PatientsWithRecentEncCohortDefinition cohortDefinition = new PatientsWithRecentEncCohortDefinition();
-        cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-        cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-
-        cd.addSearch("males", ReportUtils.map(commonCohortLibrary.males()));
-        cd.addSearch("agedAtLeastSomeAge", ReportUtils.map(commonCohortLibrary.agedAtMost(maxAge), "effectiveDate=${endDate}"));
-        cd.addSearch("sqlCohort", ReportUtils.<CohortDefinition>map(cohortDefinition, "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        cd.setCompositionString("males AND agedAtLeastSomeAge AND sqlCohort");
-        return cd;
-    }
-    //------------------------------------------------------------------------------------------------------------------
-
-
-    public CohortDefinition femalesAgedAtLeastXDead(Integer minAge) {
-        CompositionCohortDefinition cd = new CompositionCohortDefinition();
-
-        cd.setName("females aged at least Some age");
-        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-        cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-
-        DeadPatientsCohortDefinition cohortDefinition = new DeadPatientsCohortDefinition();
-        cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-        cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-
-        cd.addSearch("females", ReportUtils.map(commonCohortLibrary.females()));
-        cd.addSearch("agedAtLeastSomeAge", ReportUtils.map(commonCohortLibrary.agedAtLeast(minAge), "effectiveDate=${endDate}"));
-        cd.addSearch("sqlCohort", ReportUtils.<CohortDefinition>map(cohortDefinition, "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        cd.setCompositionString("females AND agedAtLeastSomeAge AND sqlCohort");
-        return cd;
-    }
-
-    public CohortDefinition malesAgedAtLeastXDead(Integer minAge) {
-        CompositionCohortDefinition cd = new CompositionCohortDefinition();
-
-        cd.setName("males aged at least Some age");
-        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-        cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-
-        DeadPatientsCohortDefinition cohortDefinition = new DeadPatientsCohortDefinition();
-        cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-        cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-
-        cd.addSearch("males", ReportUtils.map(commonCohortLibrary.males()));
-        cd.addSearch("agedAtLeastSomeAge", ReportUtils.map(commonCohortLibrary.agedAtLeast(minAge), "effectiveDate=${endDate}"));
-        cd.addSearch("sqlCohort", ReportUtils.<CohortDefinition>map(cohortDefinition, "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        cd.setCompositionString("males AND agedAtLeastSomeAge AND sqlCohort");
-        return cd;
-    }
-
-    public CohortDefinition femalesAgedAtMostXDead(Integer maxAge) {
-        CompositionCohortDefinition cd = new CompositionCohortDefinition();
-
-        cd.setName("females aged at least Some age");
-        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-        cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-
-        DeadPatientsCohortDefinition cohortDefinition = new DeadPatientsCohortDefinition();
-        cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
-        cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-
-        cd.addSearch("females", ReportUtils.map(commonCohortLibrary.females()));
-        cd.addSearch("agedAtLeastSomeAge", ReportUtils.map(commonCohortLibrary.agedAtMost(maxAge), "effectiveDate=${endDate}"));
-        cd.addSearch("sqlCohort", ReportUtils.<CohortDefinition>map(cohortDefinition, "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        cd.setCompositionString("females AND agedAtLeastSomeAge AND sqlCohort");
-        return cd;
-    }
-
-    public CohortDefinition malesAgedAtMostXDead(Integer maxAge) {
-        CompositionCohortDefinition cd = new CompositionCohortDefinition();
-
-        cd.setName("males aged at least Some age");
-        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
-        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
-        cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-
-        DeadPatientsCohortDefinition cohortDefinition = new DeadPatientsCohortDefinition();
+        DailyPatientsOnCareCohortDefinition cohortDefinition = new DailyPatientsOnCareCohortDefinition();
         cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
         cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
         cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
@@ -516,6 +306,155 @@ public class DailySummariesCohortLibrary {
     }
 
 
+//===========================================================================================================
+
+    //===================================================================================================
+
+    /**
+     * on ART
+     */
+
+    //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+    public CohortDefinition femalesAgedAtLeastXOnART(Integer minAge) {
+        CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+        cd.setName("females aged at least Some age");
+        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+        cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
+
+        DailyPatientsOnARTCohortDefinition cohortDefinition = new DailyPatientsOnARTCohortDefinition();
+        cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+        cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
+
+        cd.addSearch("females", ReportUtils.map(commonCohortLibrary.females()));
+        cd.addSearch("agedAtLeastSomeAge", ReportUtils.map(commonCohortLibrary.agedAtLeast(minAge), "effectiveDate=${endDate}"));
+        cd.addSearch("sqlCohort", ReportUtils.<CohortDefinition>map(cohortDefinition, "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        cd.setCompositionString("females AND agedAtLeastSomeAge AND sqlCohort");
+        return cd;
+    }
+
+    public CohortDefinition malesAgedAtLeastXOnART(Integer minAge) {
+        CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+        cd.setName("males aged at least Some age");
+        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+        cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
+
+        DailyPatientsOnARTCohortDefinition cohortDefinition = new DailyPatientsOnARTCohortDefinition();
+        cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+        cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
+
+        cd.addSearch("males", ReportUtils.map(commonCohortLibrary.males()));
+        cd.addSearch("agedAtLeastSomeAge", ReportUtils.map(commonCohortLibrary.agedAtLeast(minAge), "effectiveDate=${endDate}"));
+        cd.addSearch("sqlCohort", ReportUtils.<CohortDefinition>map(cohortDefinition, "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        cd.setCompositionString("males AND agedAtLeastSomeAge AND sqlCohort");
+        return cd;
+    }
+
+    public CohortDefinition femalesAgedAtMostXOnART(Integer maxAge) {
+        CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+        cd.setName("females aged at least Some age");
+        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+        cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
+
+        DailyPatientsOnARTCohortDefinition cohortDefinition = new DailyPatientsOnARTCohortDefinition();
+        cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+        cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
+
+        cd.addSearch("females", ReportUtils.map(commonCohortLibrary.females()));
+        cd.addSearch("agedAtLeastSomeAge", ReportUtils.map(commonCohortLibrary.agedAtMost(maxAge), "effectiveDate=${endDate}"));
+        cd.addSearch("sqlCohort", ReportUtils.<CohortDefinition>map(cohortDefinition, "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        cd.setCompositionString("females AND agedAtLeastSomeAge AND sqlCohort");
+        return cd;
+    }
+
+    public CohortDefinition patientsAgedAtMostXOnART(Integer maxAge) {
+        CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+        cd.setName("males aged at least Some age");
+        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+        cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
+
+        DailyPatientsOnARTCohortDefinition cohortDefinition = new DailyPatientsOnARTCohortDefinition();
+        cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+        cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
+
+        cd.addSearch("agedAtLeastSomeAge", ReportUtils.map(commonCohortLibrary.agedAtMost(maxAge), "effectiveDate=${endDate}"));
+        cd.addSearch("sqlCohort", ReportUtils.<CohortDefinition>map(cohortDefinition, "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        cd.setCompositionString("agedAtLeastSomeAge AND sqlCohort");
+        return cd;
+    }
+
+    public CohortDefinition patientsAgedAtLeastXOnART(Integer minAge) {
+        CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+        cd.setName("males aged at least Some age");
+        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+        cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
+
+        DailyPatientsOnARTCohortDefinition cohortDefinition = new DailyPatientsOnARTCohortDefinition();
+        cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+        cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
+
+        cd.addSearch("agedAtMostSomeAge", ReportUtils.map(commonCohortLibrary.agedAtLeast(minAge), "effectiveDate=${endDate}"));
+        cd.addSearch("sqlCohort", ReportUtils.<CohortDefinition>map(cohortDefinition, "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        cd.setCompositionString("agedAtMostSomeAge AND sqlCohort");
+        return cd;
+    }
+
+//===========================================================================================================
+
+    public CohortDefinition patientsAgedAtMostXOnCare(Integer maxAge) {
+        CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+        cd.setName("males aged at least Some age");
+        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+        cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
+
+        DailyPatientsOnCareCohortDefinition cohortDefinition = new DailyPatientsOnCareCohortDefinition();
+        cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+        cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
+
+        cd.addSearch("agedAtLeastSomeAge", ReportUtils.map(commonCohortLibrary.agedAtMost(maxAge), "effectiveDate=${endDate}"));
+        cd.addSearch("sqlCohort", ReportUtils.<CohortDefinition>map(cohortDefinition, "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        cd.setCompositionString("agedAtLeastSomeAge AND sqlCohort");
+        return cd;
+    }
+
+    public CohortDefinition patientsAgedAtLeastXOnCare(Integer minAge) {
+        CompositionCohortDefinition cd = new CompositionCohortDefinition();
+
+        cd.setName("males aged at least Some age");
+        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+        cd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
+
+        DailyPatientsOnCareCohortDefinition cohortDefinition = new DailyPatientsOnCareCohortDefinition();
+        cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cohortDefinition.addParameter(new Parameter("endDate", "End Date", Date.class));
+        cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
+
+        cd.addSearch("agedAtMostSomeAge", ReportUtils.map(commonCohortLibrary.agedAtLeast(minAge), "effectiveDate=${endDate}"));
+        cd.addSearch("sqlCohort", ReportUtils.<CohortDefinition>map(cohortDefinition, "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        cd.setCompositionString("agedAtMostSomeAge AND sqlCohort");
+        return cd;
+    }
 
 
 }

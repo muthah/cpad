@@ -39,7 +39,7 @@ public class PatientsWithRecentEncCohortDefinitionEvaluator implements CohortDef
                         "  group by e.patient_id   " +
                         "     having max(e.encounter_datetime) between date_add((:endDate),INTERVAL -93 DAY) and (:endDate)   " +
                         "  union   " +
-                        "     (select o.person_id from obs o where concept_id = 5096 and obs_datetime between (:startDate) and (:endDate) and value_datetime >= (:endDate))";
+                        "     (select o.person_id from obs o where concept_id = 5096 and value_datetime IS NOT NULL and value_datetime >= (:endDate))";
 
 
 

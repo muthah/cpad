@@ -6,6 +6,7 @@ import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferOUTCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferOUTStartCohortDefinition;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
@@ -17,7 +18,7 @@ import org.openmrs.module.reporting.evaluation.EvaluationException;
 /**
  * Evaluator for MOH 361A Cohort Definition
  */
-@Handler(supports = {TransferOUTCohortDefinition.class})
+@Handler(supports = {TransferOUTStartCohortDefinition.class})
 public class TransferOUTStartCohortDefinitionEvaluator implements CohortDefinitionEvaluator {
 
     private final Log log = LogFactory.getLog(this.getClass());
@@ -25,7 +26,7 @@ public class TransferOUTStartCohortDefinitionEvaluator implements CohortDefiniti
     @Override
     public EvaluatedCohort evaluate(CohortDefinition cohortDefinition, EvaluationContext context) throws EvaluationException {
 
-        TransferOUTCohortDefinition definition = (TransferOUTCohortDefinition) cohortDefinition;
+        TransferOUTStartCohortDefinition definition = (TransferOUTStartCohortDefinition) cohortDefinition;
 
         if (definition == null)
             return null;
@@ -37,7 +38,7 @@ public class TransferOUTStartCohortDefinitionEvaluator implements CohortDefiniti
                 "select o.person_id from person p   " +
                         "    inner join obs o using(person_id)   " +
                         "    where o.concept_id=160649   " +
-                        "    and value_datetime between (:startDate) and (:endDate)";
+                        "    and value_datetime = (:startDate) ";
 
 
 

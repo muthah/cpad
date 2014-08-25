@@ -11,6 +11,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.HIVCareEnrollment;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.AMRSReportsCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.patientManagementReports.LastCD4CountBeyond6Mths;
 import org.openmrs.module.amrsreports.reporting.provider.ReportProvider;
 import org.openmrs.module.amrsreports.service.HIVCareEnrollmentService;
 import org.openmrs.module.amrsreports.service.MOHFacilityService;
@@ -19,32 +20,24 @@ import org.openmrs.module.amrsreports.task.AMRSReportsTask;
 import org.openmrs.module.amrsreports.task.RunQueuedReportsTask;
 import org.openmrs.module.amrsreports.task.UpdateHIVCareEnrollmentTask;
 import org.openmrs.module.amrsreports.util.TaskRunnerThread;
+import org.openmrs.module.reporting.ReportingConstants;
+import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
+import org.openmrs.module.reporting.report.ReportData;
+import org.openmrs.module.reporting.report.ReportDesign;
+import org.openmrs.module.reporting.report.definition.ReportDefinition;
+import org.openmrs.module.reporting.report.definition.service.ReportDefinitionService;
+import org.openmrs.module.reporting.report.renderer.ExcelTemplateRenderer;
 import org.openmrs.scheduler.TaskDefinition;
 import org.openmrs.util.OpenmrsUtil;
 import org.openmrs.util.PrivilegeConstants;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.io.*;
+import java.util.*;
 
 /**
  * DWR service for AMRS Reports web pages
@@ -444,4 +437,74 @@ public class DWRAmrsReportService {
 		Context.removeProxyPrivilege(PrivilegeConstants.MANAGE_SCHEDULER);
 		return false;
 	}
+
+    public void testReportDownload() throws IOException {
+
+        try{
+
+           /* WebContext ctx = WebContextFactory.get();
+            HttpServletResponse response = ctx.getHttpServletResponse();
+            response.setContentType("application/vnd.ms-excel");
+            response.setHeader("Content-disposition", "attachment; filename=" + "sampleDoc" + ".xls");*/
+
+            LastCD4CountBeyond6Mths queuedReport = new LastCD4CountBeyond6Mths();
+            CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
+            //cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
+
+            ReportDefinition reportDefinition = queuedReport.getReportDefinition();
+            reportDefinition.addParameter(ReportingConstants.START_DATE_PARAMETER);
+            reportDefinition.addParameter(ReportingConstants.END_DATE_PARAMETER);
+            //reportDefinition.addParameter(facility);
+
+            EvaluationContext evaluationContext = new EvaluationContext();
+            evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), new Date());
+            evaluationContext.addParameterValue(ReportingConstants.END_DATE_PARAMETER.getName(), new Date());
+
+            evaluationContext.setEvaluationDate(new Date());
+
+            // get the cohort
+            CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
+            Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
+            evaluationContext.setBaseCohort(cohort);
+
+            ReportData reportData = Context.getService(ReportDefinitionService.class)
+                    .evaluate(reportDefinition, evaluationContext);
+
+            File xlsFile = File.createTempFile("patient_mgt_rpt", ".xls");
+            OutputStream stream = new BufferedOutputStream(new FileOutputStream(xlsFile));
+
+            // get the report design
+            final ReportDesign design = queuedReport.getReportDesign();
+
+            // build an Excel template renderer with the report design
+            ExcelTemplateRenderer renderer = new ExcelTemplateRenderer() {
+                public ReportDesign getDesign(String argument) {
+                    return design;
+                }
+            };
+
+            // render the Excel template
+            renderer.render(reportData, "reportManagement", stream);
+
+            /*OutputStream outputStream = response.getOutputStream();
+            FileInputStream fileInputStream = new FileInputStream(xlsFile);
+
+            IOUtils.copy(fileInputStream, outputStream);
+            fileInputStream.close();
+            outputStream.flush();*/
+
+            // finish off by setting stuff on the queued report
+
+            //Context.getService(QueuedReportService.class).saveQueuedReport(queuedReport);
+
+        }  catch (Exception e){
+            // queuedReport.setStatus(QueuedReport.STATUS_ERROR);
+            e.printStackTrace();
+
+            throw new RuntimeException("There was a problem running this report!!!!");
+            //Context.getService(QueuedReportService.class).saveQueuedReport(queuedReport);
+            //log.info(e.getCause());
+        }
+    }
+
 }

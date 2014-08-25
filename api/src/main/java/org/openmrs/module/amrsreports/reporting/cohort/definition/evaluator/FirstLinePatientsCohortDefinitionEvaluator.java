@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.FirstLinePatientsCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferOUTCohortDefinition;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -17,7 +18,7 @@ import org.openmrs.module.reporting.evaluation.EvaluationException;
 /**
  * Evaluator for MOH 361A Cohort Definition
  */
-@Handler(supports = {TransferOUTCohortDefinition.class})
+@Handler(supports = {FirstLinePatientsCohortDefinition.class})
 public class FirstLinePatientsCohortDefinitionEvaluator implements CohortDefinitionEvaluator {
 
     private final Log log = LogFactory.getLog(this.getClass());
@@ -25,7 +26,7 @@ public class FirstLinePatientsCohortDefinitionEvaluator implements CohortDefinit
     @Override
     public EvaluatedCohort evaluate(CohortDefinition cohortDefinition, EvaluationContext context) throws EvaluationException {
 
-        TransferOUTCohortDefinition definition = (TransferOUTCohortDefinition) cohortDefinition;
+        FirstLinePatientsCohortDefinition definition = (FirstLinePatientsCohortDefinition) cohortDefinition;
 
         if (definition == null)
             return null;

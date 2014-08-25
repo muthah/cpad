@@ -5,7 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.reporting.cohort.definition.RevisitsCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.*;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
@@ -13,11 +13,16 @@ import org.openmrs.module.reporting.cohort.definition.evaluator.CohortDefinition
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
+import org.openmrs.module.reporting.evaluation.parameter.Parameter;
+
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Evaluator for patients with recent encounters or have future appointment dates
  */
-@Handler(supports = {RevisitsCohortDefinition.class})
+@Handler(supports = {NewEnrollmentsCohortDefinition.class})
 public class NewEnrollmentsCohortDefinitionEvaluator implements CohortDefinitionEvaluator {
 
 
@@ -26,20 +31,39 @@ public class NewEnrollmentsCohortDefinitionEvaluator implements CohortDefinition
     @Override
     public EvaluatedCohort evaluate(CohortDefinition cohortDefinition, EvaluationContext context) throws EvaluationException {
 
-        RevisitsCohortDefinition definition = (RevisitsCohortDefinition) cohortDefinition;
+        NewEnrollmentsCohortDefinition definition = (NewEnrollmentsCohortDefinition) cohortDefinition;
 
         if (definition == null)
             return null;
 
+        Cohort newEnrollments = new Cohort();
+
+        PatientsOnADayCohortDefinition allPatients = new PatientsOnADayCohortDefinition();
+        PatientsWithRevisitsCohortDefinition revisits = new PatientsWithRevisitsCohortDefinition();
+
+        //add params
+        allPatients.addParameter(new Parameter("startDate", "Report Date", Date.class));
+        allPatients.addParameter(new Parameter("endDate", "End Reporting Date", Date.class));
+
+        revisits.addParameter(new Parameter("startDate", "Report Date", Date.class));
+        revisits.addParameter(new Parameter("endDate", "End Reporting Date", Date.class));
+
         context.addParameterValue("startDate", context.getParameterValue("startDate"));
         context.addParameterValue("endDate", context.getParameterValue("endDate"));
 
-        String sql =" select patient_id from encounter " +
-                "  where encounter_datetime < (:startDate) ";
+        Cohort all = Context.getService(CohortDefinitionService.class).evaluate(allPatients, context);
+        Cohort revisitPatients = Context.getService(CohortDefinitionService.class).evaluate(revisits, context);
 
-        SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition(sql);
-        Cohort results = Context.getService(CohortDefinitionService.class).evaluate(sqlCohortDefinition, context);
+        Set<Integer> finalMembers = new HashSet<Integer>();
 
-        return new EvaluatedCohort(results, sqlCohortDefinition, context);
+        for(Integer id:all.getMemberIds()){
+            if(!revisitPatients.getMemberIds().contains(id)){
+                finalMembers.add(id);
+            }
+        }
+
+        newEnrollments.setMemberIds(finalMembers);
+
+        return new EvaluatedCohort(newEnrollments, cohortDefinition, context);
     }
 }

@@ -15,7 +15,6 @@
 package org.openmrs.module.amrsreports.web.controller;
 
 import org.apache.commons.lang.StringUtils;
-import org.openmrs.Cohort;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
@@ -35,7 +34,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.SortedSet;
 
 @Controller
 public class CCCDownloadController {

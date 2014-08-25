@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.AttendedPatientsCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.BookedPatientsCohortDefinition;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -17,7 +18,7 @@ import org.openmrs.module.reporting.evaluation.EvaluationException;
 /**
  * Evaluator for Dead Patients Cohort Definition
  */
-@Handler(supports = {BookedPatientsCohortDefinition.class})
+@Handler(supports = {AttendedPatientsCohortDefinition.class})
 public class AttendedPatientsCohortDefinitionEvaluator implements CohortDefinitionEvaluator {
 
 
@@ -26,7 +27,7 @@ public class AttendedPatientsCohortDefinitionEvaluator implements CohortDefiniti
     @Override
     public EvaluatedCohort evaluate(CohortDefinition cohortDefinition, EvaluationContext context) throws EvaluationException {
 
-        BookedPatientsCohortDefinition definition = (BookedPatientsCohortDefinition) cohortDefinition;
+        AttendedPatientsCohortDefinition definition = (AttendedPatientsCohortDefinition) cohortDefinition;
 
         if (definition == null)
             return null;
@@ -34,17 +35,13 @@ public class AttendedPatientsCohortDefinitionEvaluator implements CohortDefiniti
 		context.addParameterValue("startDate", context.getParameterValue("startDate"));
         context.addParameterValue("endDate", context.getParameterValue("endDate"));
 
-        String sql =
-                "select person_id from person   " +
-                        " where dead = 1   " +
-                        " and death_date is not null   " +
-                        " and death_date between (:startDate) and (:endDate)   " +
-                        " union   " +
-                        "    (select person_id from obs   " +
-                        "     where concept_id = 1543   " +
-                        "     and value_datetime is not null  " +
-                        "     and value_datetime between (:startDate) and (:endDate)  " +
-                        "    )";
+        String sql ="select   e.patient_id  " +
+                "  from encounter e  " +
+                "  inner join person p  " +
+                "  on p.person_id=e.patient_id   " +
+                "    where e.voided = 0  " +
+                "    and p.voided=0   " +
+                "    and e.encounter_datetime = (:startDate)  ";
 
 
 

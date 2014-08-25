@@ -46,7 +46,19 @@
         evaluationEndDate = new DatePicker("<openmrs:datePattern/>", "reportingEndDate", { });
         evaluationEndDate.setDate(new Date());
 
+
+
     });
+
+    function checkFacility(){
+        var indicator= $j("#facility").val();
+        if(indicator ==null){
+            alert("You must select one or more facility/location to proceed");
+
+            return false;
+        }
+        return true;
+    }
 
 </script>
 
@@ -60,7 +72,7 @@
         <br/>
     </spring:hasBindErrors>
 
-    <form method="POST">
+    <form method="POST" onsubmit="return checkFacility();">
         <fieldset class="visualPadding">
             <legend>Dates</legend>
             <table cellspacing="0" cellpadding="2">
@@ -187,7 +199,7 @@
             </spring:bind>
         </fieldset>
 
-                <input id="submitButton" class="visualPadding newline" type="submit" value="Queue for processing"/>
+                <input id="submitButton"  class="visualPadding newline" type="submit" value="Queue for processing"/>
 
     </form>
 

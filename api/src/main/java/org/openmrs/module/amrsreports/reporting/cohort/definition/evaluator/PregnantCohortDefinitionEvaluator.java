@@ -6,6 +6,7 @@ import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.EnrolledInCareCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.PregnantCohortDefinition;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
@@ -17,14 +18,14 @@ import org.openmrs.module.reporting.evaluation.EvaluationException;
 /**
  * Evaluator for MOH 361A Cohort Definition
  */
-@Handler(supports = {EnrolledInCareCohortDefinition.class})
+@Handler(supports = {PregnantCohortDefinition.class})
 public class PregnantCohortDefinitionEvaluator implements CohortDefinitionEvaluator {
     private final Log log = LogFactory.getLog(this.getClass());
 
     @Override
     public EvaluatedCohort evaluate(CohortDefinition cohortDefinition, EvaluationContext context) throws EvaluationException {
 
-        EnrolledInCareCohortDefinition definition = (EnrolledInCareCohortDefinition) cohortDefinition;
+        PregnantCohortDefinition definition = (PregnantCohortDefinition) cohortDefinition;
 
         if (definition == null)
             return null;
@@ -33,10 +34,10 @@ public class PregnantCohortDefinitionEvaluator implements CohortDefinitionEvalua
         context.addParameterValue("endDate", context.getParameterValue("endDate"));
 
         String sql =
-                "select o.person_id from person p   " +
-                        "    inner join obs o using(person_id)   " +
-                        "    where o.concept_id=160555   " +
-                        "    and value_datetime between (:startDate) and (:endDate)";
+                "select person_id from obs     " +
+                        "        where concept_id=5272     " +
+                        "        and obs_datetime between (:startDate) and (:endDate)     " +
+                        "        and value_coded = 1065";
 
 
 

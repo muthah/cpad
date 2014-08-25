@@ -4,8 +4,8 @@ import org.apache.commons.io.IOUtils;
 import org.openmrs.Location;
 import org.openmrs.api.APIException;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
-import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.ICAPCCCNoDataDefinition;
+import org.openmrs.module.amrsreports.reporting.converter.OnARTOrCareConverter;
+import org.openmrs.module.amrsreports.reporting.data.*;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.common.SortCriteria;
@@ -25,6 +25,8 @@ import org.openmrs.util.OpenmrsClassLoader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -45,8 +47,22 @@ public class BookedAndAttendedReportProvider extends ReportProvider {
 		ReportDefinition report = new PeriodIndicatorReportDefinition();
 		report.setName("Booked and Attended");
 
+        report.addParameter(new Parameter("startDate", "Report Date", Date.class));
+        report.addParameter(new Parameter("endDate", "End Reporting Date", Date.class));
+        report.addParameter(new Parameter("locationList", "List of Locations", Location.class));
+
+        Map<String, Object> periodMappings = new HashMap<String, Object>();
+        periodMappings.put("startDate", "${startDate}");
+        periodMappings.put("endDate", "${endDate}");
+        periodMappings.put("locationList", "${locationList}");
+
 		PatientDataSetDefinition dsd = new PatientDataSetDefinition();
 		dsd.setName("bookedAndAttended");
+
+        dsd.addParameter(new Parameter("startDate", "Report Date", Date.class));
+        dsd.addParameter(new Parameter("endDate", "End Reporting Date", Date.class));
+        dsd.addParameter(new Parameter("locationList", "List of Locations", Location.class));
+
 
         dsd.addSortCriteria("id", SortCriteria.SortDirection.ASC);
         dsd.addColumn("id", new ICAPCCCNoDataDefinition(), nullString);
@@ -56,7 +72,25 @@ public class BookedAndAttendedReportProvider extends ReportProvider {
 		AgeAtEvaluationDateDataDefinition add = new AgeAtEvaluationDateDataDefinition();
 		dsd.addColumn("age", add, nullString, new DecimalAgeConverter(0));
 
-		report.addDataSetDefinition(dsd,null);
+        PatientOnARTDataDefinition art = new PatientOnARTDataDefinition();
+        art.addParameter(new Parameter("startDate", "Report Date", Date.class));
+        art.addParameter(new Parameter("endDate", "End Reporting Date", Date.class));
+        art.addParameter(new Parameter("locationList", "List of Locations", Location.class));
+        dsd.addColumn("patientOn", art,periodMappings, new OnARTOrCareConverter());
+
+        BookedStatusDataDefinition booked = new BookedStatusDataDefinition();
+        booked.addParameter(new Parameter("startDate", "Report Date", Date.class));
+        booked.addParameter(new Parameter("endDate", "End Reporting Date", Date.class));
+        booked.addParameter(new Parameter("locationList", "List of Locations", Location.class));
+        dsd.addColumn("booked", booked,periodMappings);
+
+        AttendedStatusDataDefinition attended = new AttendedStatusDataDefinition();
+        attended.addParameter(new Parameter("startDate", "Report Date", Date.class));
+        attended.addParameter(new Parameter("endDate", "End Reporting Date", Date.class));
+        attended.addParameter(new Parameter("locationList", "List of Locations", Location.class));
+        dsd.addColumn("attended", art,periodMappings);
+
+		report.addDataSetDefinition(dsd, null);
 
 		return report;
 	}
@@ -70,7 +104,7 @@ public class BookedAndAttendedReportProvider extends ReportProvider {
                 "  on p.person_id=e.patient_id   " +
                 "    where e.voided = 0  " +
                 "    and p.voided=0   " +
-                "    and e.encounter_datetime between (:startDate) and (:endDate)  " +
+                "    and e.encounter_datetime = (:startDate)  " +
                 "    and e.location_id in ( :locationList ) ";
 
         String booked ="select  o.person_id  " +
@@ -79,7 +113,7 @@ public class BookedAndAttendedReportProvider extends ReportProvider {
                 "  on p.person_id=o.person_id   " +
                 "    where o.voided = 0  " +
                 "    and p.voided=0   " +
-                "    and o.concept_id = 5096 and value_datetime between (:startDate) and (:endDate)  " +
+                "    and o.concept_id = 5096 and value_datetime between date_add((:startDate),INTERVAL -1 DAY) and date_add((:startDate),INTERVAL 1 DAY)  " +
                 "    and o.location_id in ( :locationList ) ";
 
 

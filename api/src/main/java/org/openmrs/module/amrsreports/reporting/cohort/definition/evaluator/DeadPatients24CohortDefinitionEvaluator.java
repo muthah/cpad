@@ -6,6 +6,7 @@ import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.DeadPatients12CohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.DeadPatients24CohortDefinition;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
@@ -17,7 +18,7 @@ import org.openmrs.module.reporting.evaluation.EvaluationException;
 /**
  * Evaluator for Dead Patients Cohort Definition
  */
-@Handler(supports = {DeadPatients12CohortDefinition.class})
+@Handler(supports = {DeadPatients24CohortDefinition.class})
 public class DeadPatients24CohortDefinitionEvaluator implements CohortDefinitionEvaluator {
 
 
@@ -26,7 +27,7 @@ public class DeadPatients24CohortDefinitionEvaluator implements CohortDefinition
     @Override
     public EvaluatedCohort evaluate(CohortDefinition cohortDefinition, EvaluationContext context) throws EvaluationException {
 
-        DeadPatients12CohortDefinition definition = (DeadPatients12CohortDefinition) cohortDefinition;
+        DeadPatients24CohortDefinition definition = (DeadPatients24CohortDefinition) cohortDefinition;
 
         if (definition == null)
             return null;
@@ -38,12 +39,12 @@ public class DeadPatients24CohortDefinitionEvaluator implements CohortDefinition
                 "select person_id from person   " +
                         " where dead = 1   " +
                         " and death_date is not null   " +
-                        " and death_date between (:startDate) and (:endDate)   " +
+                        " and death_date > date_add((:startDate),INTERVAL 12 MONTH) and death_date <= date_add((:startDate),INTERVAL 24 MONTH)   " +
                         " union   " +
                         "    (select person_id from obs   " +
                         "     where concept_id = 1543   " +
                         "     and value_datetime is not null  " +
-                        "     and value_datetime between (:startDate) and (:endDate)  " +
+                        "     and value_datetime > date_add((:startDate),INTERVAL 12 MONTH) and value_datetime <= date_add((:startDate),INTERVAL 24 MONTH)  " +
                         "    )";
 
 

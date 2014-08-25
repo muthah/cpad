@@ -3,9 +3,32 @@ package org.openmrs.module.amrsreports.reporting.provider;
 import org.apache.commons.io.IOUtils;
 import org.openmrs.Location;
 import org.openmrs.api.APIException;
+import org.openmrs.module.amrsreports.reporting.CohortAnalysisIndicatorLibrary;
 import org.openmrs.module.amrsreports.reporting.CommonIndicatorLibrary;
 import org.openmrs.module.amrsreports.reporting.ReportUtils;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.CCCPatientCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.CurrentlyOnARTCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.DeadPatients12CohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.DeadPatients24CohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.DeadPatientsCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.DeadPatientsStartCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.EnrolledInCareCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.LFTUCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.LFTUStartCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.PatientsWithRecentEncAtStartCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.StartedARTCareCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.StartedARTCareStartCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.StoppedARTCare12CohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.StoppedARTCare24CohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.StoppedARTCareCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferIN12CohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferIN24CohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferINCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferINStartCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferOUT12CohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferOUT24CohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferOUTCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferOUTStartCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.indicatorsSQLLib.BaseSQLCohortLibrary;
 import org.openmrs.module.amrsreports.reporting.indicatorsSQLLib.cohortAnalysis.CohortAnalysisSQLCohortLibrary;
 import org.openmrs.module.amrsreports.reporting.indicatorsSQLLib.palliativeCare.PalliativeCareSQLCohortLibrary;
@@ -34,6 +57,7 @@ public class SameCohortAnalysisReportProvider extends ReportProvider {
 
     private BaseSQLCohortLibrary baseSQLCohortLibrary = new BaseSQLCohortLibrary();
     private CohortAnalysisSQLCohortLibrary sqlQueries = new CohortAnalysisSQLCohortLibrary();
+    private CohortAnalysisIndicatorLibrary indicatorLibrary = new CohortAnalysisIndicatorLibrary();
 
 	public SameCohortAnalysisReportProvider() {
 		this.name = "Same Cohorts Analysis";
@@ -135,42 +159,41 @@ public class SameCohortAnalysisReportProvider extends ReportProvider {
         dsd.addParameter(facility);
 
 
-        dsd.addColumn("originalCohort12", "Original Cohort", new Mapped<CohortIndicator>(originalCohortAtStartInd, periodMappings), "");
-        dsd.addColumn("transferIn12", "Patients who transferred In", new Mapped<CohortIndicator>(transferInAtStartInd, periodMappings), "");
-        dsd.addColumn("transferOut12", "Patients who transferred out", new Mapped<CohortIndicator>(transferOutAtStartInd, periodMappings), "");
-        dsd.addColumn("firstLineRegimen12", "Patients on original first line regimen", new Mapped<CohortIndicator>(originalFirstLineAtStartInd, periodMappings), "");
+        dsd.addColumn("originalCohort12", "Original Cohort", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("Original Cohort",new EnrolledInCareCohortDefinition()), periodMappings), "");
+        dsd.addColumn("transferIn12", "Patients who transferred In", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("Original Transfer In",new TransferINStartCohortDefinition()), periodMappings), "");
+        dsd.addColumn("transferOut12", "Patients who transferred out", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("Original Transfer Out",new TransferOUTStartCohortDefinition()), periodMappings), "");
+        dsd.addColumn("firstLineRegimen12", "Patients on original first line regimen", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("Original First Line Patients",new StartedARTCareStartCohortDefinition()), periodMappings), "");
         dsd.addColumn("alternativeFirstLineRegimen12", "Patients on alternative first line regimen", new Mapped<CohortIndicator>(alternativeFirstLineAtStartInd, periodMappings), "");
         dsd.addColumn("secondLineRegimen12", "Patients on second line regimen or higher", new Mapped<CohortIndicator>(secondLineAtStartInd, periodMappings), "");
-        dsd.addColumn("stopped12", "Patients who stopped ART", new Mapped<CohortIndicator>(stoppedAtStartInd, periodMappings), "");
-        dsd.addColumn("lost12", "Lost patients", new Mapped<CohortIndicator>(lostAtStartInd, periodMappings), "");
-        dsd.addColumn("died12", "Dead patients", new Mapped<CohortIndicator>(diedAtStartInd, periodMappings), "");
-        dsd.addColumn("currentlyOnART12", "Patients who are alive and on ART", new Mapped<CohortIndicator>(aliveOnARTAtStartInd, periodMappings), "");
+        dsd.addColumn("stopped12", "Patients who stopped ART", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("Original Stopped ART",new StoppedARTCareCohortDefinition()), periodMappings), "");
+        dsd.addColumn("lost12", "Lost patients", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("original lftu",new LFTUStartCohortDefinition()), periodMappings), "");
+        dsd.addColumn("died12", "Dead patients", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("Original Dead Patients",new DeadPatientsStartCohortDefinition()), periodMappings), "");
+        dsd.addColumn("currentlyOnART12", "Patients who are alive and on ART", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("Alive and on ART",new CurrentlyOnARTCohortDefinition()), periodMappings), "");
 
 
-        dsd.addColumn("originalCohort24", "Original Cohort", new Mapped<CohortIndicator>(originalCohortAt12Ind, periodMappings), "");
-        dsd.addColumn("transferIn24", "Patients who transferred In", new Mapped<CohortIndicator>(transferInAt12Ind, periodMappings), "");
-        dsd.addColumn("transferOut24", "Patients who transferred out", new Mapped<CohortIndicator>(transferOutAt12Ind, periodMappings), "");
+        dsd.addColumn("originalCohort24", "Original Cohort", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("12 month cohort",new EnrolledInCareCohortDefinition()), periodMappings), "");
+        dsd.addColumn("transferIn24", "Patients who transferred In", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("12 month TI", new TransferIN12CohortDefinition()), periodMappings), "");
+        dsd.addColumn("transferOut24", "Patients who transferred out", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("12 month TO", new TransferOUT12CohortDefinition()), periodMappings), "");
         dsd.addColumn("firstLineRegimen24", "Patients on original first line regimen", new Mapped<CohortIndicator>(originalFirstLineAt12Ind, periodMappings), "");
         dsd.addColumn("alternativeFirstLineRegimen24", "Patients on alternative first line regimen", new Mapped<CohortIndicator>(alternativeFirstLineAt12Ind, periodMappings), "");
         dsd.addColumn("secondLineRegimen24", "Patients on second line regimen or higher", new Mapped<CohortIndicator>(secondLineAt12Ind, periodMappings), "");
-        dsd.addColumn("stopped24", "Patients who stopped ART", new Mapped<CohortIndicator>(stoppedAt12Ind, periodMappings), "");
-        dsd.addColumn("lost24", "Lost patients", new Mapped<CohortIndicator>(lostAt12Ind, periodMappings), "");
-        dsd.addColumn("died24", "Dead patients", new Mapped<CohortIndicator>(diedAt12Ind, periodMappings), "");
-        dsd.addColumn("currentlyOnART24", "Patients who are alive and on ART", new Mapped<CohortIndicator>(aliveOnARTAt12Ind, periodMappings), "");
+        dsd.addColumn("stopped24", "Patients who stopped ART", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("12 month stopped",new StoppedARTCare12CohortDefinition()), periodMappings), "");
+        //dsd.addColumn("lost24", "Lost patients", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("12 month lost",new PatientsWithRecentEncAtStartCohortDefinition()), periodMappings), "");
+        dsd.addColumn("died24", "Dead patients", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("12 month dead",new DeadPatients12CohortDefinition()), periodMappings), "");
+        dsd.addColumn("currentlyOnART24", "Patients who are alive and on ART", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("12 month alive and on ART",new CurrentlyOnARTCohortDefinition()), periodMappings), "");
 
 
 
-        dsd.addColumn("originalCohort36", "Original Cohort", new Mapped<CohortIndicator>(originalCohortAt24Ind, periodMappings), "");
-        dsd.addColumn("transferIn36", "Patients who transferred In", new Mapped<CohortIndicator>(transferInAt24Ind, periodMappings), "");
-        dsd.addColumn("transferOut36", "Patients who transferred out", new Mapped<CohortIndicator>(transferOutAt24Ind, periodMappings), "");
+        dsd.addColumn("originalCohort36", "Original Cohort", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("24 month cohort",new EnrolledInCareCohortDefinition()), periodMappings), "");
+        dsd.addColumn("transferIn36", "Patients who transferred In", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("24 month TI",new TransferIN24CohortDefinition()), periodMappings), "");
+        dsd.addColumn("transferOut36", "Patients who transferred out", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("24 month TO",new TransferOUT24CohortDefinition()), periodMappings), "");
         dsd.addColumn("firstLineRegimen36", "Patients on original first line regimen", new Mapped<CohortIndicator>(originalFirstLineAt24Ind, periodMappings), "");
         dsd.addColumn("alternativeFirstLineRegimen36", "Patients on alternative first line regimen", new Mapped<CohortIndicator>(alternativeFirstLineAt24Ind, periodMappings), "");
         dsd.addColumn("secondLineRegimen36", "Patients on second line regimen or higher", new Mapped<CohortIndicator>(secondLineAt24Ind, periodMappings), "");
-        dsd.addColumn("stopped36", "Patients who stopped ART", new Mapped<CohortIndicator>(stoppedAt24Ind, periodMappings), "");
-        dsd.addColumn("lost36", "Lost patients", new Mapped<CohortIndicator>(lostAt24Ind, periodMappings), "");
-        dsd.addColumn("died36", "Dead patients", new Mapped<CohortIndicator>(diedAt24Ind, periodMappings), "");
-        dsd.addColumn("currentlyOnART36", "Patients who are alive and on ART", new Mapped<CohortIndicator>(aliveOnARTAt24Ind, periodMappings), "");
-
+        dsd.addColumn("stopped36", "Patients who stopped ART", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("24 month stopped",new StoppedARTCare24CohortDefinition()), periodMappings), "");
+        //dsd.addColumn("lost36", "Lost patients", new Mapped<CohortIndicator>(lostAt24Ind, periodMappings), "");
+        dsd.addColumn("died36", "Dead patients", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("24 month dead",new DeadPatients24CohortDefinition()), periodMappings), "");
+        dsd.addColumn("currentlyOnART36", "Patients who are alive and on ART", new Mapped<CohortIndicator>(indicatorLibrary.cohortIndicatorCount("24 month alive and on art",new CurrentlyOnARTCohortDefinition()), periodMappings), "");
 		report.addDataSetDefinition(dsd, periodMappings);
 
 		return report;

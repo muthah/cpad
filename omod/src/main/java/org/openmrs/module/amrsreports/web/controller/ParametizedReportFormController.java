@@ -18,17 +18,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
-
 import java.util.Date;
 import java.util.List;
 
@@ -42,7 +36,7 @@ public class ParametizedReportFormController {
 
 	private final Log log = LogFactory.getLog(getClass());
 
-	private static final String FORM_VIEW = "module/amrsreports/queuedReportForm";
+	private static final String FORM_VIEW = "module/amrsreports/parametizedReportForm";
 	private static final String SUCCESS_VIEW = "redirect:queuedReport.list";
 
 	@ModelAttribute("facilities")
@@ -69,7 +63,7 @@ public class ParametizedReportFormController {
 		return sdf.format(new Date());
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedReport.form")
+	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form")
 	public String processForm(HttpServletRequest request,
 							  @ModelAttribute("queuedReports") QueuedReport editedReport,
 							  BindingResult errors,
@@ -108,7 +102,7 @@ public class ParametizedReportFormController {
 		return SUCCESS_VIEW;
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/queuedReport.form")
+	@RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/queuedParametizedReport.form")
 	public String editQueuedReport(
 			@RequestParam(value = "queuedReportId", required = false) Integer queuedReportId,
             @RequestParam(value = "status", required = false) String status,
@@ -157,7 +151,7 @@ public class ParametizedReportFormController {
 		return FORM_VIEW;
 	}
 
-    @RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/removeQueuedReport.form")
+    @RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/removeQueuedParametizedReport.form")
     public String removeQueuedReport( HttpServletRequest request,
             @RequestParam(value = "queuedReportId", required = false) Integer queuedReportId,
             ModelMap modelMap

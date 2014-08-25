@@ -16,8 +16,10 @@ package org.openmrs.module.amrsreports.reporting.data.evaluator;
 import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.CD4LessThan350CohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.OnARTCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.PregnantCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.data.PregnantAndOnARTCD4Below350DataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.PregnantAndOnARTDataDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
@@ -33,7 +35,7 @@ import java.util.Set;
 /**
  * Evaluates an ObsForPersonDataDefinition to produce a PersonData
  */
-@Handler(supports = PregnantAndOnARTDataDefinition.class, order = 50)
+@Handler(supports = PregnantAndOnARTCD4Below350DataDefinition.class, order = 50)
 public class PregnantAndOnARTCD4Below350DataEvaluator implements PersonDataEvaluator {
 
 
@@ -52,6 +54,7 @@ public class PregnantAndOnARTCD4Below350DataEvaluator implements PersonDataEvalu
 
         PregnantCohortDefinition pregnantCohort = new PregnantCohortDefinition();
         OnARTCohortDefinition onArt = new OnARTCohortDefinition();
+        CD4LessThan350CohortDefinition cd4Below350 = new CD4LessThan350CohortDefinition();
 
         //add params
         pregnantCohort.addParameter(new Parameter("startDate", "Report Date", Date.class));
@@ -59,6 +62,9 @@ public class PregnantAndOnARTCD4Below350DataEvaluator implements PersonDataEvalu
 
         onArt.addParameter(new Parameter("startDate", "Report Date", Date.class));
         onArt.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+        cd4Below350.addParameter(new Parameter("startDate", "Report Date", Date.class));
+        cd4Below350.addParameter(new Parameter("endDate", "End Date", Date.class));
 
         context.addParameterValue("startDate", context.getParameterValue("startDate"));
         context.addParameterValue("endDate", context.getParameterValue("endDate"));
@@ -69,11 +75,14 @@ public class PregnantAndOnARTCD4Below350DataEvaluator implements PersonDataEvalu
         Cohort artPatients = Context.getService(CohortDefinitionService.class).evaluate(onArt, context);
         Set<Integer> patientsOnART = artPatients.getMemberIds();
 
+        Cohort artPatientswithCD4Below350 = Context.getService(CohortDefinitionService.class).evaluate(cd4Below350, context);
+        Set<Integer> artCD4Below350Patients = artPatientswithCD4Below350.getMemberIds();
+
 
         for (Integer memberId : context.getBaseCohort().getMemberIds()) {
             String isTrue =  "No";
 
-            if(pregnantPatientIds.contains(memberId) && patientsOnART.contains(memberId)){
+            if(pregnantPatientIds.contains(memberId) && patientsOnART.contains(memberId) && artCD4Below350Patients.contains(memberId)){
                   isTrue = "Yes";
             }
 

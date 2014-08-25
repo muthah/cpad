@@ -34,7 +34,7 @@ public class RevisitsCohortDefinitionEvaluator implements CohortDefinitionEvalua
         context.addParameterValue("startDate", context.getParameterValue("startDate"));
         context.addParameterValue("endDate", context.getParameterValue("endDate"));
 
-        String sql =" select patient_id from encounter " +
+        String sql = " select patient_id from encounter " +
                 "  where encounter_datetime < (:startDate) ";
 
         SqlCohortDefinition sqlCohortDefinition = new SqlCohortDefinition(sql);

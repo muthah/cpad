@@ -8,6 +8,8 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.CurrentlyInCareCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.DeadPatientsCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.EnrolledInCareCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.LFTUCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.PatientsWithRecentEncCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferINCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferOUTCohortDefinition;
 import org.openmrs.module.reporting.cohort.EvaluatedCohort;
@@ -25,9 +27,10 @@ import java.util.Set;
 /**
  * Evaluator for Dead Patients Cohort Definition
  */
-@Handler(supports = {CurrentlyInCareCohortDefinition.class})
+@Handler(supports = {LFTUCohortDefinition.class})
 public class LFTUCohortDefinitionEvaluator implements CohortDefinitionEvaluator {
     /**
+     * LFTU = Enrolled + TI - (dead + To + recent visits + future appointments )
      * in care = enrolled in care + transfer In - Transfer Out - Dead - LFTU
      */
 
@@ -36,17 +39,18 @@ public class LFTUCohortDefinitionEvaluator implements CohortDefinitionEvaluator 
     @Override
     public EvaluatedCohort evaluate(CohortDefinition cohortDefinition, EvaluationContext context) throws EvaluationException {
 
-        CurrentlyInCareCohortDefinition definition = (CurrentlyInCareCohortDefinition) cohortDefinition;
+        LFTUCohortDefinition definition = (LFTUCohortDefinition) cohortDefinition;
 
         if (definition == null)
             return null;
 
-        Cohort currentlyInCare = new Cohort();
+        Cohort lftu = new Cohort();
 
         EnrolledInCareCohortDefinition enrolled = new EnrolledInCareCohortDefinition();
         TransferINCohortDefinition ti = new TransferINCohortDefinition();
         TransferOUTCohortDefinition to = new TransferOUTCohortDefinition();
         DeadPatientsCohortDefinition dead = new DeadPatientsCohortDefinition();
+        PatientsWithRecentEncCohortDefinition recentVisits = new PatientsWithRecentEncCohortDefinition();
 
         //add params
         enrolled.addParameter(new Parameter("startDate", "Report Date", Date.class));
@@ -61,6 +65,9 @@ public class LFTUCohortDefinitionEvaluator implements CohortDefinitionEvaluator 
         dead.addParameter(new Parameter("startDate", "Report Date", Date.class));
         dead.addParameter(new Parameter("endDate", "End Reporting Date", Date.class));
 
+        recentVisits.addParameter(new Parameter("startDate", "Report Date", Date.class));
+        recentVisits.addParameter(new Parameter("endDate", "End Reporting Date", Date.class));
+
 
 		context.addParameterValue("startDate", context.getParameterValue("startDate"));
         context.addParameterValue("endDate", context.getParameterValue("endDate"));
@@ -71,15 +78,29 @@ public class LFTUCohortDefinitionEvaluator implements CohortDefinitionEvaluator 
         Cohort tiPatients = Context.getService(CohortDefinitionService.class).evaluate(ti, context);
         Cohort toPatients = Context.getService(CohortDefinitionService.class).evaluate(to, context);
         Cohort deadPatients = Context.getService(CohortDefinitionService.class).evaluate(dead, context);
+        Cohort recentPatients = Context.getService(CohortDefinitionService.class).evaluate(recentVisits, context);
 
-        Set<Integer> finalMembers = new HashSet<Integer>();
-        finalMembers.addAll(enrolledPatients.getMemberIds());
-        finalMembers.addAll(tiPatients.getMemberIds());
-        finalMembers.removeAll(toPatients.getMemberIds());
-        finalMembers.removeAll(deadPatients.getMemberIds());
+        Set<Integer> enrolledP = enrolledPatients.getMemberIds();
+        Set<Integer> tiP = tiPatients.getMemberIds();
+        Set<Integer> toP = toPatients.getMemberIds();
+        Set<Integer> deadP = deadPatients.getMemberIds();
+        Set<Integer> recentP = recentPatients.getMemberIds();
 
-        currentlyInCare.setMemberIds(finalMembers);
+        Set<Integer> enrolledNTi = new HashSet<Integer>(enrolledP);
+        enrolledNTi.addAll(tiP);
 
-        return new EvaluatedCohort(currentlyInCare, cohortDefinition, context);
+        Set<Integer> originalCohort = enrolledNTi;
+
+        enrolledNTi.removeAll(toP);
+        enrolledNTi.removeAll(deadP);
+        enrolledNTi.removeAll(recentP);
+
+        for(Integer id: enrolledNTi){
+            if(originalCohort.contains(id)){
+               lftu.addMember(id);
+            }
+        }
+
+        return new EvaluatedCohort(lftu, cohortDefinition, context);
     }
 }

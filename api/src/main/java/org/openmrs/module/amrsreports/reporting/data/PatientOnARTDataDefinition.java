@@ -25,6 +25,6 @@ public class PatientOnARTDataDefinition extends BaseDataDefinition implements Pe
 
 	@Override
 	public Class<?> getDataType() {
-		return Integer.class;
+		return String.class;
 	}
 }

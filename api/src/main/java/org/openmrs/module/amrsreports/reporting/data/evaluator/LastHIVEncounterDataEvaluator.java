@@ -1,6 +1,7 @@
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
 import org.openmrs.Cohort;
+import org.openmrs.Encounter;
 import org.openmrs.annotation.Handler;
 import org.openmrs.module.amrsreports.reporting.common.EncounterRepresentation;
 import org.openmrs.module.amrsreports.reporting.common.EncounterRepresentationDatetimeComparator;
@@ -52,27 +53,30 @@ public class LastHIVEncounterDataEvaluator extends BatchedExecutionDataEvaluator
 	@Override
 	protected void doAfter(EvaluationContext context, EvaluatedPersonData c) {
 		// pass
+        Encounter en = new Encounter();
+
 	}
 
 	@Override
 	protected String getHQL() {
 		return "select new map(" +
-				"   e.patientId as personId," +
-				"   nullif(encounterDatetime,'0000-00-00 00:00:00') as encounterDatetime," +
+				"   e.patient.patientId as personId," +
+				"   e.encounterDatetime as encounterDatetime," +
 				"	e.location.name as locationName" +
 				" )" +
 				" from Encounter e" +
 				" where e.voided = false" +
-				"   and e.patientId in (:personIds) " +
+				"   and e.patient.patientId in (:personIds) " +
 				"   and e.encounterType.id in (:encounterTypeIds)" +
-				"   and e.encounterDatetime <= :onOrBefore";
+				"   and e.encounterDatetime <= :onOrBefore" +
+                "   and e.encounterDatetime !='0000-00-00 00:00:00' ";
 	}
 
 	@Override
 	protected Map<String, Object> getSubstitutions(EvaluationContext context) {
 
 		Map<String, Object> m = new HashMap<String, Object>();
-		m.put("encounterTypeIds", Arrays.asList(1, 2, 3, 4, 13));
+		m.put("encounterTypeIds", Arrays.asList(1, 2));
 		m.put("onOrBefore", context.getEvaluationDate());
 
 		return m;

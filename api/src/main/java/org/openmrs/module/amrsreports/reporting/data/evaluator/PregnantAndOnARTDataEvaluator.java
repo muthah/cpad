@@ -16,8 +16,10 @@ package org.openmrs.module.amrsreports.reporting.data.evaluator;
 import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.OnARTCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.PregnantCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.data.PregnancyStatusDataDefinition;
+import org.openmrs.module.amrsreports.reporting.data.PregnantAndOnARTDataDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
@@ -32,7 +34,7 @@ import java.util.Set;
 /**
  * Evaluates an ObsForPersonDataDefinition to produce a PersonData
  */
-@Handler(supports = PregnancyStatusDataDefinition.class, order = 50)
+@Handler(supports = PregnantAndOnARTDataDefinition.class, order = 50)
 public class PregnantAndOnARTDataEvaluator implements PersonDataEvaluator {
 
 
@@ -50,10 +52,14 @@ public class PregnantAndOnARTDataEvaluator implements PersonDataEvaluator {
 		}
 
         PregnantCohortDefinition pregnantCohort = new PregnantCohortDefinition();
+        OnARTCohortDefinition onArt = new OnARTCohortDefinition();
 
         //add params
         pregnantCohort.addParameter(new Parameter("startDate", "Report Date", Date.class));
         pregnantCohort.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+        onArt.addParameter(new Parameter("startDate", "Report Date", Date.class));
+        onArt.addParameter(new Parameter("endDate", "End Date", Date.class));
 
         context.addParameterValue("startDate", context.getParameterValue("startDate"));
         context.addParameterValue("endDate", context.getParameterValue("endDate"));
@@ -61,8 +67,16 @@ public class PregnantAndOnARTDataEvaluator implements PersonDataEvaluator {
         Cohort pregnantPatients = Context.getService(CohortDefinitionService.class).evaluate(pregnantCohort, context);
         Set<Integer> pregnantPatientIds = pregnantPatients.getMemberIds();
 
+        Cohort artPatients = Context.getService(CohortDefinitionService.class).evaluate(onArt, context);
+        Set<Integer> patientsOnART = artPatients.getMemberIds();
+
+
         for (Integer memberId : context.getBaseCohort().getMemberIds()) {
-            String isTrue =  pregnantPatientIds.contains(memberId)?"Yes":"No";
+            String isTrue =  "No";
+
+            if(pregnantPatientIds.contains(memberId) && patientsOnART.contains(memberId)){
+                  isTrue = "Yes";
+            }
 
             c.addData(memberId, isTrue);
         }
