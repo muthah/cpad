@@ -1,8 +1,11 @@
 package org.openmrs.module.amrsreports.web.dwr;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.directwebremoting.WebContext;
+import org.directwebremoting.WebContextFactory;
 import org.openmrs.Cohort;
 import org.openmrs.Patient;
 import org.openmrs.api.APIAuthenticationException;
@@ -11,7 +14,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.HIVCareEnrollment;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.AMRSReportsCohortDefinition;
-import org.openmrs.module.amrsreports.reporting.patientManagementReports.LastCD4CountBeyond6Mths;
+import org.openmrs.module.amrsreports.reporting.patientManagementReports.ChildrenCD4MNotInHARRTReport;
 import org.openmrs.module.amrsreports.reporting.provider.ReportProvider;
 import org.openmrs.module.amrsreports.service.HIVCareEnrollmentService;
 import org.openmrs.module.amrsreports.service.MOHFacilityService;
@@ -440,14 +443,12 @@ public class DWRAmrsReportService {
 
     public void testReportDownload() throws IOException {
 
+        WebContext ctx = WebContextFactory.get();
+        HttpServletResponse response = ctx.getHttpServletResponse();
+
+        ChildrenCD4MNotInHARRTReport queuedReport = new ChildrenCD4MNotInHARRTReport();
+
         try{
-
-           /* WebContext ctx = WebContextFactory.get();
-            HttpServletResponse response = ctx.getHttpServletResponse();
-            response.setContentType("application/vnd.ms-excel");
-            response.setHeader("Content-disposition", "attachment; filename=" + "sampleDoc" + ".xls");*/
-
-            LastCD4CountBeyond6Mths queuedReport = new LastCD4CountBeyond6Mths();
             CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
             //cohortDefinition.addParameter(new Parameter("locationList", "List of Locations", Location.class));
 
@@ -485,13 +486,17 @@ public class DWRAmrsReportService {
 
             // render the Excel template
             renderer.render(reportData, "reportManagement", stream);
+            stream.close();
 
-            /*OutputStream outputStream = response.getOutputStream();
+            response.setHeader("Content-disposition", "attachment; filename=" + "sampleDoc" + ".xls");
+            response.setContentType("application/vnd.ms-excel");
+            OutputStream excelFileDownload = response.getOutputStream();
             FileInputStream fileInputStream = new FileInputStream(xlsFile);
 
-            IOUtils.copy(fileInputStream, outputStream);
+            IOUtils.copy(fileInputStream, excelFileDownload);
             fileInputStream.close();
-            outputStream.flush();*/
+            excelFileDownload.flush();
+            excelFileDownload.close();
 
             // finish off by setting stuff on the queued report
 

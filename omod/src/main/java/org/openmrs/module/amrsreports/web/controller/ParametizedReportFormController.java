@@ -1,15 +1,31 @@
 package org.openmrs.module.amrsreports.web.controller;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Cohort;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.QueuedReport;
+import org.openmrs.module.amrsreports.reporting.patientManagementReports.ChildrenCD4MNotInHARRTReport;
+import org.openmrs.module.amrsreports.reporting.patientManagementReports.ChildrenCD4YNotInHAARTReport;
+import org.openmrs.module.amrsreports.reporting.patientManagementReports.ChildrenNotInHAARTReport;
+import org.openmrs.module.amrsreports.reporting.patientManagementReports.LatestCD4CountReport;
 import org.openmrs.module.amrsreports.reporting.provider.ReportProvider;
 import org.openmrs.module.amrsreports.service.QueuedReportService;
 import org.openmrs.module.amrsreports.service.ReportProviderRegistrar;
 import org.openmrs.module.amrsreports.service.UserFacilityService;
+import org.openmrs.module.reporting.ReportingConstants;
+import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
+import org.openmrs.module.reporting.evaluation.EvaluationContext;
+import org.openmrs.module.reporting.evaluation.parameter.Parameter;
+import org.openmrs.module.reporting.report.ReportData;
+import org.openmrs.module.reporting.report.ReportDesign;
+import org.openmrs.module.reporting.report.definition.ReportDefinition;
+import org.openmrs.module.reporting.report.definition.service.ReportDefinitionService;
+import org.openmrs.module.reporting.report.renderer.ExcelTemplateRenderer;
 import org.openmrs.util.OpenmrsUtil;
 import org.openmrs.web.WebConstants;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -21,8 +37,11 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.*;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -39,69 +58,350 @@ public class ParametizedReportFormController {
 	private static final String FORM_VIEW = "module/amrsreports/parametizedReportForm";
 	private static final String SUCCESS_VIEW = "redirect:queuedReport.list";
 
-	@ModelAttribute("facilities")
-	public List<MOHFacility> getFacilities() {
-		return Context.getService(UserFacilityService.class).getAllowedFacilitiesForUser(Context.getAuthenticatedUser());
+	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "childrenNotInHaartReport")
+	public void childrenNotInHaartIrrespectiveOfCD4Count(HttpServletRequest request, HttpServletResponse response ) throws Exception {
+
+        Integer maxAge = Integer.valueOf(request.getParameter("childrenNotInHaartAgeInM"));
+        String effectiveDate = request.getParameter("evaluationDate");
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date startDate = sdf.parse(effectiveDate);
+        Date endDate = new Date();
+
+        ChildrenNotInHAARTReport queuedReport = new ChildrenNotInHAARTReport();
+        queuedReport.setMaxAge(maxAge);
+
+        try{
+            CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
+            cohortDefinition.addParameter(new Parameter("effectiveDate", "Effective Date", Date.class));
+
+            ReportDefinition reportDefinition = queuedReport.getReportDefinition();
+            EvaluationContext evaluationContext = new EvaluationContext();
+            evaluationContext.setEvaluationDate(endDate);
+            evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), startDate);
+            evaluationContext.addParameterValue(ReportingConstants.END_DATE_PARAMETER.getName(), endDate);
+            // get the cohort
+            CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
+            Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
+            evaluationContext.setBaseCohort(cohort);
+
+            ReportData reportData = Context.getService(ReportDefinitionService.class)
+                    .evaluate(reportDefinition, evaluationContext);
+
+            File xlsFile = File.createTempFile("patient_mgt_rpt", ".xls");
+            OutputStream stream = new BufferedOutputStream(new FileOutputStream(xlsFile));
+
+            final ReportDesign design = queuedReport.getReportDesign();
+            ExcelTemplateRenderer renderer = new ExcelTemplateRenderer() {
+                public ReportDesign getDesign(String argument) {
+                    return design;
+                }
+            };
+            renderer.render(reportData, "reportManagement", stream);
+            stream.close();
+
+            response.setHeader("Content-disposition", "attachment; filename=" + "sampleDoc" + ".xls");
+            response.setContentType("application/vnd.ms-excel");
+            OutputStream excelFileDownload = response.getOutputStream();
+            FileInputStream fileInputStream = new FileInputStream(xlsFile);
+
+            IOUtils.copy(fileInputStream, excelFileDownload);
+            fileInputStream.close();
+            excelFileDownload.flush();
+            excelFileDownload.close();
+
+        }  catch (Exception e){
+            e.printStackTrace();
+
+            throw new RuntimeException("There was a problem running this report!!!!");
+        }
+
+
+
+        //================================
+
+		//httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Please wait as the report is processed." + persistencetimes + " ==" + effectiveDate);
+
+		//return SUCCESS_VIEW;
 	}
 
-	@ModelAttribute("reportProviders")
-	public List<ReportProvider> getReportProviders() {
-		return ReportProviderRegistrar.getInstance().getAllReportProviders();
-	}
+    @RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "childrenCD4MReport")
+    public void childrenCD4NotInHAARTM(HttpServletRequest request, HttpServletResponse response ) throws Exception {
 
-	@ModelAttribute("datetimeFormat")
-	public String getDatetimeFormat() {
-		SimpleDateFormat sdf = Context.getDateFormat();
-		String format = sdf.toPattern();
-		format += " h:mm a";
-		return format;
-	}
+        Integer minAge = Integer.valueOf(request.getParameter("childrenMinAgeM"));
+        Integer maxAge = Integer.valueOf(request.getParameter("childrenMaxAgeM"));
+        Double maxCd4Count = Double.valueOf(request.getParameter("childrenMaxCD4M"));
+        String effectiveDate = request.getParameter("evaluationDate");
 
-	@ModelAttribute("now")
-	public String getNow() {
-		SimpleDateFormat sdf = new SimpleDateFormat(getDatetimeFormat());
-		return sdf.format(new Date());
-	}
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date startDate = sdf.parse(effectiveDate);
+        Date endDate = new Date();
 
-	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form")
-	public String processForm(HttpServletRequest request,
-							  @ModelAttribute("queuedReports") QueuedReport editedReport,
-							  BindingResult errors,
-							  @RequestParam(value = "repeatIntervalUnits", required = false) String repeatIntervalUnits
-	) throws Exception {
+        ChildrenCD4MNotInHARRTReport queuedReport = new ChildrenCD4MNotInHARRTReport();
+        queuedReport.setMaxAge(maxAge);
+        queuedReport.setMinAge(minAge);
+        queuedReport.setValue1(maxCd4Count);
 
-        HttpSession httpSession = request.getSession();
-        QueuedReportService queuedReportService = Context.getService(QueuedReportService.class);
-		// determine the repeat interval by units
-		repeatIntervalUnits = repeatIntervalUnits.toLowerCase().trim();
+        try{
+            CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
+            cohortDefinition.addParameter(new Parameter("effectiveDate", "Effective Date", Date.class));
+            cohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+            cohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
 
-		// ignore if the repeat interval is empty / zero
-		if (editedReport.getRepeatInterval() == null || editedReport.getRepeatInterval() < 0) {
-			editedReport.setRepeatInterval(0);
+            ReportDefinition reportDefinition = queuedReport.getReportDefinition();
+            EvaluationContext evaluationContext = new EvaluationContext();
+            evaluationContext.setEvaluationDate(endDate);
+            evaluationContext.addParameterValue("effectiveDate",endDate);
+            evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), startDate);
+            evaluationContext.addParameterValue(ReportingConstants.END_DATE_PARAMETER.getName(), endDate);
+            // get the cohort
+            CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
+            Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
+            evaluationContext.setBaseCohort(cohort);
 
-		} else if (editedReport.getRepeatInterval() > 0) {
+            ReportData reportData = Context.getService(ReportDefinitionService.class)
+                    .evaluate(reportDefinition, evaluationContext);
 
-			if (OpenmrsUtil.nullSafeEquals(repeatIntervalUnits, "minutes")) {
-				editedReport.setRepeatInterval(editedReport.getRepeatInterval() * 60);
-			} else if (OpenmrsUtil.nullSafeEquals(repeatIntervalUnits, "hours")) {
-				editedReport.setRepeatInterval(editedReport.getRepeatInterval() * 60 * 60);
-			} else {
-				// assume days
-				editedReport.setRepeatInterval(editedReport.getRepeatInterval() * 60 * 60 * 24);
-			}
-		}
+            File xlsFile = File.createTempFile("patient_mgt_rpt", ".xls");
+            OutputStream stream = new BufferedOutputStream(new FileOutputStream(xlsFile));
 
-	// save it
-        editedReport.setDateScheduled(new Date());
-		queuedReportService.saveQueuedReport(editedReport);
+            final ReportDesign design = queuedReport.getReportDesign();
+            ExcelTemplateRenderer renderer = new ExcelTemplateRenderer() {
+                public ReportDesign getDesign(String argument) {
+                    return design;
+                }
+            };
+            renderer.render(reportData, "reportManagement", stream);
+            stream.close();
 
-		// kindly respond
+            response.setHeader("Content-disposition", "attachment; filename=" + "sampleDoc" + ".xls");
+            response.setContentType("application/vnd.ms-excel");
+            OutputStream excelFileDownload = response.getOutputStream();
+            FileInputStream fileInputStream = new FileInputStream(xlsFile);
 
-		httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Report queued for processing.");
+            IOUtils.copy(fileInputStream, excelFileDownload);
+            fileInputStream.close();
+            excelFileDownload.flush();
+            excelFileDownload.close();
 
-		return SUCCESS_VIEW;
-	}
+        }  catch (Exception e){
+            e.printStackTrace();
 
+            throw new RuntimeException("There was a problem running this report!!!!");
+        }
+
+
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "childrenCD4YReport")
+    public void childrenCD4NotInHAARTY(HttpServletRequest request, HttpServletResponse response ) throws Exception {
+
+        Integer minAge = Integer.valueOf(request.getParameter("childrenMinAgeY"));
+        Integer maxAge = Integer.valueOf(request.getParameter("childrenMaxAgeY"));
+        Double maxCd4Count = Double.valueOf(request.getParameter("childrenMaxCD4Y"));
+        String effectiveDate = request.getParameter("evaluationDate");
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date startDate = sdf.parse(effectiveDate);
+        Date endDate = new Date();
+
+        ChildrenCD4YNotInHAARTReport queuedReport = new ChildrenCD4YNotInHAARTReport();
+        queuedReport.setMaxAge(maxAge);
+        queuedReport.setMinAge(minAge);
+        queuedReport.setValue1(maxCd4Count);
+
+        try{
+            CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
+            cohortDefinition.addParameter(new Parameter("effectiveDate", "Effective Date", Date.class));
+            cohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+            cohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
+
+            ReportDefinition reportDefinition = queuedReport.getReportDefinition();
+            EvaluationContext evaluationContext = new EvaluationContext();
+            evaluationContext.setEvaluationDate(endDate);
+            evaluationContext.addParameterValue("effectiveDate",endDate);
+            evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), startDate);
+            evaluationContext.addParameterValue(ReportingConstants.END_DATE_PARAMETER.getName(), endDate);
+            // get the cohort
+            CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
+            Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
+            evaluationContext.setBaseCohort(cohort);
+
+            ReportData reportData = Context.getService(ReportDefinitionService.class)
+                    .evaluate(reportDefinition, evaluationContext);
+
+            File xlsFile = File.createTempFile("patient_mgt_rpt", ".xls");
+            OutputStream stream = new BufferedOutputStream(new FileOutputStream(xlsFile));
+
+            final ReportDesign design = queuedReport.getReportDesign();
+            ExcelTemplateRenderer renderer = new ExcelTemplateRenderer() {
+                public ReportDesign getDesign(String argument) {
+                    return design;
+                }
+            };
+            renderer.render(reportData, "reportManagement", stream);
+            stream.close();
+
+            response.setHeader("Content-disposition", "attachment; filename=" + "sampleDoc" + ".xls");
+            response.setContentType("application/vnd.ms-excel");
+            OutputStream excelFileDownload = response.getOutputStream();
+            FileInputStream fileInputStream = new FileInputStream(xlsFile);
+
+            IOUtils.copy(fileInputStream, excelFileDownload);
+            fileInputStream.close();
+            excelFileDownload.flush();
+            excelFileDownload.close();
+
+        }  catch (Exception e){
+            e.printStackTrace();
+
+            throw new RuntimeException("There was a problem running this report!!!!");
+        }
+
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "childrenLatestCD4Report")
+    public void childrenLatestCD4Report( HttpServletRequest request, HttpServletResponse response ) throws Exception {
+
+        Integer period = Integer.valueOf(request.getParameter("childrenLatestCD4"));
+        String effectiveDate = request.getParameter("evaluationDate");
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date startDate = sdf.parse(effectiveDate);
+
+        Calendar cl = Calendar.getInstance();
+        cl.add(Calendar.MONTH, -(period));
+
+        Date endDate = cl.getTime();
+
+        LatestCD4CountReport queuedReport = new LatestCD4CountReport();
+        queuedReport.setMaxAge(14);
+        queuedReport.setMinAge(0);
+
+        try{
+            CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
+            cohortDefinition.addParameter(new Parameter("effectiveDate", "Effective Date", Date.class));
+            cohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+            cohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
+
+            ReportDefinition reportDefinition = queuedReport.getReportDefinition();
+            EvaluationContext evaluationContext = new EvaluationContext();
+            evaluationContext.setEvaluationDate(endDate);
+            evaluationContext.addParameterValue("effectiveDate",endDate);
+            evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), startDate);
+            evaluationContext.addParameterValue(ReportingConstants.END_DATE_PARAMETER.getName(), endDate);
+            // get the cohort
+            CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
+            Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
+            evaluationContext.setBaseCohort(cohort);
+
+            ReportData reportData = Context.getService(ReportDefinitionService.class)
+                    .evaluate(reportDefinition, evaluationContext);
+
+            File xlsFile = File.createTempFile("patient_mgt_rpt", ".xls");
+            OutputStream stream = new BufferedOutputStream(new FileOutputStream(xlsFile));
+
+            final ReportDesign design = queuedReport.getReportDesign();
+            ExcelTemplateRenderer renderer = new ExcelTemplateRenderer() {
+                public ReportDesign getDesign(String argument) {
+                    return design;
+                }
+            };
+            renderer.render(reportData, "reportManagement", stream);
+            stream.close();
+
+            response.setHeader("Content-disposition", "attachment; filename=" + "sampleDoc" + ".xls");
+            response.setContentType("application/vnd.ms-excel");
+            OutputStream excelFileDownload = response.getOutputStream();
+            FileInputStream fileInputStream = new FileInputStream(xlsFile);
+
+            IOUtils.copy(fileInputStream, excelFileDownload);
+            fileInputStream.close();
+            excelFileDownload.flush();
+            excelFileDownload.close();
+
+        }  catch (Exception e){
+            e.printStackTrace();
+
+            throw new RuntimeException("There was a problem running this report!!!!");
+        }
+
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "adultsLatestCD4Report")
+    public void adultsLatestCD4Report( HttpServletRequest request, HttpServletResponse response ) throws Exception {
+
+        Integer period = Integer.valueOf(request.getParameter("adultsLatestCD4"));
+        String effectiveDate = request.getParameter("evaluationDate");
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date startDate = sdf.parse(effectiveDate);
+
+        Calendar cl = Calendar.getInstance();
+        cl.add(Calendar.MONTH, -(period));
+
+        Date endDate = cl.getTime();
+
+        LatestCD4CountReport queuedReport = new LatestCD4CountReport();
+        queuedReport.setMaxAge(200);
+        queuedReport.setMinAge(15);
+
+        try{
+            CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
+            cohortDefinition.addParameter(new Parameter("effectiveDate", "Effective Date", Date.class));
+            cohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+            cohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
+
+            ReportDefinition reportDefinition = queuedReport.getReportDefinition();
+            EvaluationContext evaluationContext = new EvaluationContext();
+            evaluationContext.setEvaluationDate(endDate);
+            evaluationContext.addParameterValue("effectiveDate",endDate);
+            evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), startDate);
+            evaluationContext.addParameterValue(ReportingConstants.END_DATE_PARAMETER.getName(), endDate);
+            // get the cohort
+            CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
+            Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
+            evaluationContext.setBaseCohort(cohort);
+
+            ReportData reportData = Context.getService(ReportDefinitionService.class)
+                    .evaluate(reportDefinition, evaluationContext);
+
+            File xlsFile = File.createTempFile("patient_mgt_rpt", ".xls");
+            OutputStream stream = new BufferedOutputStream(new FileOutputStream(xlsFile));
+
+            final ReportDesign design = queuedReport.getReportDesign();
+            ExcelTemplateRenderer renderer = new ExcelTemplateRenderer() {
+                public ReportDesign getDesign(String argument) {
+                    return design;
+                }
+            };
+            renderer.render(reportData, "reportManagement", stream);
+            stream.close();
+
+            response.setHeader("Content-disposition", "attachment; filename=" + "sampleDoc" + ".xls");
+            response.setContentType("application/vnd.ms-excel");
+            OutputStream excelFileDownload = response.getOutputStream();
+            FileInputStream fileInputStream = new FileInputStream(xlsFile);
+
+            IOUtils.copy(fileInputStream, excelFileDownload);
+            fileInputStream.close();
+            excelFileDownload.flush();
+            excelFileDownload.close();
+
+        }  catch (Exception e){
+            e.printStackTrace();
+
+            throw new RuntimeException("There was a problem running this report!!!!");
+        }
+
+    }
+
+
+
+    /**
+     *
+     * methods for GET
+     */
 	@RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/queuedParametizedReport.form")
 	public String editQueuedReport(
 			@RequestParam(value = "queuedReportId", required = false) Integer queuedReportId,
@@ -191,7 +491,7 @@ public class ParametizedReportFormController {
         //SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 		// Another date format for datetime
-		SimpleDateFormat datetimeFormat = new SimpleDateFormat(getDatetimeFormat());
+		SimpleDateFormat datetimeFormat = new SimpleDateFormat("dd/mm/yyyy");
 
 		binder.registerCustomEditor(Date.class, new CustomDateEditor(datetimeFormat, true));
 	}

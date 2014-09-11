@@ -46,13 +46,26 @@
         evaluationEndDate = new DatePicker("<openmrs:datePattern/>", "reportingEndDate", { });
         evaluationEndDate.setDate(new Date());
 
-        $j("#testbutton").click(function(){
-            DWRAmrsReportService.testReportDownload(function(mapResult){
+
+
+        $j("#adultcd4report").click(function(){
+            var startDate = String($j("#evaluationDate").val());
+            var maxMonths = $j("#adultsMaxMonths").val();
+
+            DWRAmrsReportService.saveAdultsCd4DoneMoreThan6Months(startDate,maxMonths,function(mapResult){
                 alert("It is trying to download");
             });
 
 
         });
+
+       /* $j("#testbutton").click(function(){
+            DWRAmrsReportService.testReportDownload(function(mapResult){
+                alert("It is trying to download");
+            });
+
+
+        });*/
 
     });
 
@@ -75,7 +88,7 @@
                     <td>The patient who made any visit between this date up to today is considered as Active Patient</td>
                     <td>
                         <spring:bind path="queuedReports.evaluationDate">
-                        <input type="text" id="evaluationDate" name="${status.expression}" value="${status.value}"/>
+                        <input type="text" id="evaluationDate" name="evaluationDate" value="${status.value}"/>
                         <c:if test="${status.error}">
                             Error codes:
                             <c:forEach items="${status.errorMessages}" var="error">
@@ -95,17 +108,17 @@
                 </tr>
                 <tr>
                     <td colspan="2">
-                        Persistent ( <input type="text" size="4" /> or more ) CD4 counts less than <input type="text" size="4" /> , <input type="text" size="4" /> months or more after initiation of HAART &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" id="testbutton" value="  +  " />
+                        Persistent ( <input type="text" name="adultPersistencetimes" id="adultPersistencetimes" size="4" /> or more ) CD4 counts less than <input type="text" size="4" /> , <input type="text" size="4" /> months or more after initiation of HAART &nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="adultsPersistence" id="adultsPersistence" value="  +  " />
                     </td>
                 </tr>
                 <tr>
                     <td colspan="2">
-                        CD4 count drop to or below pre-treatment baseline level,  <input type="text" size="4" /> months or more after initiation of HAART &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="  +  " />
+                        CD4 count drop to or below pre-treatment baseline level,  <input type="text" size="4" /> months or more after initiation of HAART &nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="adultsCd4dropBelowPreTreatment" id="adultsCd4dropBelowPreTreatment" value="  +  " />
                     </td>
                 </tr>
                 <tr>
                     <td colspan="2">
-                        CD4 count drop of  <input type="text" size="4" /> % (or more from on-treatment peak value during the follow-up period. Subsequent CD4 counts (after drop) failed to reach peak level ever attained on HAART &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="  +  " />
+                        CD4 count drop of  <input type="text" size="4" /> % (or more from on-treatment peak value during the follow-up period. Subsequent CD4 counts (after drop) failed to reach peak level ever attained on HAART &nbsp;&nbsp;&nbsp;&nbsp;<input name="adultsCd4DropPercentage" id="adultsCd4DropPercentage" type="submit" value="  +  " />
                     </td>
                 </tr>
                 <tr>
@@ -115,12 +128,12 @@
                 </tr>
                 <tr>
                     <td colspan="2">
-                        All patients with CD4 <  <input type="text" size="4" /> ml (irrespective of pregnancy) not on ART &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="  +  " />
+                        All patients with CD4 <  <input type="text" name="adultsMaxCD4noPreg" size="4" /> ml (irrespective of pregnancy) not on ART &nbsp;&nbsp;&nbsp;&nbsp;<input id="adultsMaxCD4noPregReport" name="adultsMaxCD4noPregReport" type="submit" value="  +  " />
                     </td>
                 </tr>
                 <tr>
                     <td colspan="2">
-                        All TB/HIV co-infected patients not on ART &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="  +  " />
+                        All TB/HIV co-infected patients not on ART &nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="adultsTBHIVCoinfectedReport" id="adultsTBHIVCoinfectedReport" value="  +  " />
                     </td>
                 </tr>
                 <tr>
@@ -130,7 +143,7 @@
                 </tr>
                 <tr>
                     <td colspan="2">
-                        All patients whose latest CD4 was done more than <input type="text" size="4" /> months ago &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="  +  " />
+                        All patients whose latest CD4 was done more than <input type="text" name="adultsLatestCD4" size="4" /> months ago &nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="adultsLatestCD4Report"   value="  +  " />
                     </td>
                 </tr>
 
@@ -148,12 +161,12 @@
                 </tr>
                 <tr>
                     <td colspan="2">
-                        Children aged <input type="text" size="4" /> - <input type="text" size="4" /> months with absolute CD4 counts of <input type="text" size="4" /> (or below), <input type="text" size="4" /> months or more after initiation of HAART &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="  +  " />
+                        Children aged <input type="text" size="4" name="childminmonths" id="childminmonths" /> - <input type="text" size="4" name="childmaxmonths" id="childmaxmonths"/> months with absolute CD4 counts of <input type="text" size="4" name="childabscd4max" id="childabscd4max"/> (or below), <input type="text" size="4" /> months or more after initiation of HAART &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="  +  " />
                     </td>
                 </tr>
                 <tr>
                     <td colspan="2">
-                       Children older than  <input type="text" size="4" /> years with CD4 counts of <input type="text" size="4" /> (or below), <input type="text" size="4" /> months or more after initiation of HAART    &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="  +  " />                </td>
+                       Children older than  <input type="text" size="4" name="childrenolderthann" /> years with CD4 counts of <input type="text" size="4" name="childrenolderthan" /> (or below), <input type="text" size="4" /> months or more after initiation of HAART    &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="  +  " />                </td>
                 </tr>
                 <tr>
                     <td colspan="2">
@@ -172,17 +185,17 @@
                 </tr>
                 <tr>
                     <td colspan="2">
-                        All children less than  <input type="text" size="4" /> months regardless of CD4 counts, who are not on HAART &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="  +  " />
+                        All children less than  <input type="text" size="4" name="childrenNotInHaartAgeInM" /> months regardless of CD4 counts, who are not on HAART &nbsp;&nbsp;&nbsp;&nbsp;<input name="childrenNotInHaartReport" type="submit" value="  +  " />
                     </td>
                 </tr>
                 <tr>
                     <td colspan="2">
-                        All children aged between  <input type="text" size="4" /> - <input type="text" size="4" /> months with CD4 counts less than <input type="text" size="4" /> , who are not on HAART &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="  +  " />
+                        All children aged between  <input type="text" size="4" name="childrenMinAgeM" /> - <input type="text" size="4" name="childrenMaxAgeM" /> months with CD4 counts less than <input type="text" size="4" name="childrenMaxCD4M" /> , who are not on HAART &nbsp;&nbsp;&nbsp;&nbsp;<input name="childrenCD4MReport"  type="submit" value="  +  " />
                     </td>
                 </tr>
                 <tr>
                     <td colspan="2">
-                        All children aged between  <input type="text" size="4" /> - <input type="text" size="4" /> years with CD4 counts below <input type="text" size="4" /> , who are not on HAART
+                        All children aged between  <input type="text" size="4" name="childrenMinAgeY" /> - <input name="childrenMaxAgeY" type="text" size="4" /> years with CD4 counts below <input type="text" size="4" name="childrenMaxCD4Y" /> , who are not on HAART &nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="childrenCD4YReport" value="  +  " />
                     </td>
                 </tr>
 
@@ -193,19 +206,13 @@
                 </tr>
                 <tr>
                     <td colspan="2">
-                        All patients whose latest CD4 was done more than <input type="text" size="4" /> months ago  &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="  +  " />
+                        All patients whose latest CD4 was done more than <input type="text" name="childrenLatestCD4" size="4" /> months ago  &nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="childrenLatestCD4Report" value="  +  " />
                     </td>
                 </tr>
 
 
             </table>
         </fieldset>
-
-
-
-
-
-
 
     </form>
 

@@ -477,6 +477,21 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="amrsreports-2014-09-1e" author="aojwang">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="amrsreports_queued_report" columnName="report_specific_params"/>
+            </not>
+        </preConditions>
+        <comment>
+            Adding report_specific_params to the amrsreports_queued_report table
+        </comment>
+
+        <addColumn tableName="amrsreports_queued_report">
+            <column name="report_specific_params" type="varchar(100)"/>
+        </addColumn>
+    </changeSet>
+
 
     <changeSet id="amrsreports-2014-03-13f" author="aojwang">
         <preConditions onFail="MARK_RAN">
