@@ -17,7 +17,7 @@
         <property name="repeatInterval" type="int" column="repeat_interval" />
         <property name="csvFilename" type="java.lang.String" column="csv_file_location"/>
         <property name="xlsFilename" type="java.lang.String" column="xls_file_location"/>
-
+        <property name="extraParams" type="java.lang.String" column="report_specific_params"/>
         <property length="38" name="uuid" type="java.lang.String" unique="true"/>
 	</class>
 </hibernate-mapping>

@@ -23,6 +23,7 @@ public class QueuedReport extends BaseOpenmrsObject {
     private Integer repeatInterval = 0;
 	private String csvFilename;
 	private String xlsFilename;
+    private String extraParams;
 
 	public static final String STATUS_NEW = "NEW";
 	public static final String STATUS_ERROR = "ERROR";
@@ -77,7 +78,15 @@ public class QueuedReport extends BaseOpenmrsObject {
 		this.status = status;
 	}
 
-	@Override
+    public String getExtraParams() {
+        return extraParams;
+    }
+
+    public void setExtraParams(String extraParams) {
+        this.extraParams = extraParams;
+    }
+
+    @Override
 	public Integer getId() {
 		return getQueuedReportId();
 	}
