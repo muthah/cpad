@@ -2,12 +2,20 @@ package org.openmrs.module.amrsreports.reporting.patientManagementReports;
 
 import org.apache.commons.io.IOUtils;
 import org.openmrs.api.APIException;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.amrsreports.reporting.PatientMgtCohortLibrary;
+import org.openmrs.module.amrsreports.reporting.ReportUtils;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.DeadPatientsCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.EnrolledInCareCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferINCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferOUTCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ICAPCCCNoDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ICAPCD4CountDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ICAPMaritalStatusDataDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
+import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
 import org.openmrs.module.reporting.common.SortCriteria;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
@@ -30,14 +38,47 @@ import java.util.Properties;
 /**
  * provides CD4 reports for adults and adolescents
  */
-public class AdultsCoInfectedWithHIVAndTBNotOnART {
+public class HIVandTBPatientsNOTOnARTReport {
 
-	public AdultsCoInfectedWithHIVAndTBNotOnART() {
+    private Integer minAge;
+    private Integer maxAge;
+    private Double value1;
+    private Double value2;
 
-	}
+    public Integer getMinAge() {
+        return minAge;
+    }
+
+    public void setMinAge(Integer minAge) {
+        this.minAge = minAge;
+    }
+
+    public Integer getMaxAge() {
+        return maxAge;
+    }
+
+    public void setMaxAge(Integer maxAge) {
+        this.maxAge = maxAge;
+    }
+
+    public Double getValue1() {
+        return value1;
+    }
+
+    public void setValue1(Double value1) {
+        this.value1 = value1;
+    }
+
+    public Double getValue2() {
+        return value2;
+    }
+
+    public void setValue2(Double value2) {
+        this.value2 = value2;
+    }
 
 
-	public ReportDefinition getReportDefinition() {
+    public ReportDefinition getReportDefinition() {
 
 		String nullString = null;
 		ReportDefinition report = new PeriodIndicatorReportDefinition();
@@ -53,9 +94,9 @@ public class AdultsCoInfectedWithHIVAndTBNotOnART {
 
 		AgeAtEvaluationDateDataDefinition add = new AgeAtEvaluationDateDataDefinition();
 		dsd.addColumn("age", add, nullString, new DecimalAgeConverter(0));
-        dsd.addColumn("cd4", new ICAPCD4CountDataDefinition(), nullString);
+        /*dsd.addColumn("cd4", new ICAPCD4CountDataDefinition(), nullString);
         dsd.addColumn("maritalStatus", new ICAPMaritalStatusDataDefinition(), nullString);
-
+*/
 		report.addDataSetDefinition(dsd,null);
 
 		return report;
@@ -63,24 +104,30 @@ public class AdultsCoInfectedWithHIVAndTBNotOnART {
 
 
 	public CohortDefinition getCohortDefinition() {
-        String sql ="select  o.person_id  " +
-                "  from obs o  " +
-                "  inner join person p  " +
-                "  on p.person_id=o.person_id   " +
-                "    where o.voided = 0  " +
-                "    and p.voided=0   " +
-                "    and o.concept_id = 5497 "+
-                "  group by o.person_id " +
-                "  having max(obs_datetime) < date_add(now(),INTERVAL -6 MONTH)" ;
+        PatientMgtCohortLibrary library = new PatientMgtCohortLibrary();
+        CohortDefinition cohortDefinition = library.ageRangeInYears(this.getMinAge(), this.getMaxAge());
+        cohortDefinition.setName("Adults Cohort");
+        cohortDefinition.addParameter(new Parameter("effectiveDate", "Effective Date",Date.class));
 
+        EnrolledInCareCohortDefinition enrolledInHIV = new EnrolledInCareCohortDefinition();
+        enrolledInHIV.addParameter(new Parameter("startDate", "Report Date", Date.class));
+        enrolledInHIV.addParameter(new Parameter("endDate", "End Reporting Date", Date.class));
 
-        CohortDefinition generalCOhort = new SqlCohortDefinition(sql);
-        generalCOhort.setName("Adults with last CD4 Count test done > 6 months ago");
+        CohortDefinition tbPatients = library.hasObs(Context.getConceptService().getConcept(307),Context.getConceptService().getConcept(703));
+        tbPatients.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
+        tbPatients.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
 
-        generalCOhort.addParameter(new Parameter("startDate", "Report Date", Date.class));
-        generalCOhort.addParameter(new Parameter("endDate", "End Reporting Date", Date.class));
-        //generalCOhort.addParameter(new Parameter("locationList", "List of Locations", Location.class));
-        return generalCOhort;
+        CompositionCohortDefinition ccd = new CompositionCohortDefinition();
+        ccd.addParameter(new Parameter("endDate", "Before Date", Date.class));
+        ccd.addParameter(new Parameter("startDate", "After Date", Date.class));
+        ccd.addParameter(new Parameter("effectiveDate", "Effective Date",Date.class));
+        ccd.setName("Composition cohort for children with a given CD4 count");
+        ccd.addSearch("adultsCohort", ReportUtils.map(cohortDefinition, "effectiveDate=${effectiveDate}"));
+        ccd.addSearch("tbPatients", ReportUtils.map(tbPatients, "onOrAfter=${startDate},onOrBefore=${endDate}"));
+        ccd.addSearch("hivPatients", ReportUtils.<CohortDefinition>map(enrolledInHIV, "startDate=${startDate},endDate=${endDate}"));
+        ccd.setCompositionString("adultsCohort AND tbPatients AND hivPatients");
+
+        return ccd;
 	}
 
 

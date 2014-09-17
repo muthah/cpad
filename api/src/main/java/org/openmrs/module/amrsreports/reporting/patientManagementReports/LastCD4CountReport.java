@@ -93,9 +93,9 @@ public class LastCD4CountReport {
 
 		AgeAtEvaluationDateDataDefinition add = new AgeAtEvaluationDateDataDefinition();
 		dsd.addColumn("age", add, nullString, new DecimalAgeConverter(0));
-        dsd.addColumn("cd4", new ICAPCD4CountDataDefinition(), nullString);
+        /*dsd.addColumn("cd4", new ICAPCD4CountDataDefinition(), nullString);
         dsd.addColumn("maritalStatus", new ICAPMaritalStatusDataDefinition(), nullString);
-
+*/
 		report.addDataSetDefinition(dsd,null);
 
 		return report;
