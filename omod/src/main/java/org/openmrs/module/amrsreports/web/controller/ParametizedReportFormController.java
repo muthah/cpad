@@ -8,10 +8,7 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.QueuedReport;
-import org.openmrs.module.amrsreports.reporting.patientManagementReports.ChildrenCD4MNotInHARRTReport;
-import org.openmrs.module.amrsreports.reporting.patientManagementReports.ChildrenCD4YNotInHAARTReport;
-import org.openmrs.module.amrsreports.reporting.patientManagementReports.ChildrenNotInHAARTReport;
-import org.openmrs.module.amrsreports.reporting.patientManagementReports.LatestCD4CountReport;
+import org.openmrs.module.amrsreports.reporting.patientManagementReports.*;
 import org.openmrs.module.amrsreports.reporting.provider.ReportProvider;
 import org.openmrs.module.amrsreports.service.QueuedReportService;
 import org.openmrs.module.amrsreports.service.ReportProviderRegistrar;
@@ -100,7 +97,7 @@ public class ParametizedReportFormController {
             renderer.render(reportData, "reportManagement", stream);
             stream.close();
 
-            response.setHeader("Content-disposition", "attachment; filename=" + "sampleDoc" + ".xls");
+            response.setHeader("Content-disposition", "attachment; filename=" + "patientMgtReport" + ".xls");
             response.setContentType("application/vnd.ms-excel");
             OutputStream excelFileDownload = response.getOutputStream();
             FileInputStream fileInputStream = new FileInputStream(xlsFile);
@@ -109,7 +106,7 @@ public class ParametizedReportFormController {
             fileInputStream.close();
             excelFileDownload.flush();
             excelFileDownload.close();
-
+            xlsFile.delete();
         }  catch (Exception e){
             e.printStackTrace();
 
@@ -174,7 +171,7 @@ public class ParametizedReportFormController {
             renderer.render(reportData, "reportManagement", stream);
             stream.close();
 
-            response.setHeader("Content-disposition", "attachment; filename=" + "sampleDoc" + ".xls");
+            response.setHeader("Content-disposition", "attachment; filename=" + "patientMgtReport" + ".xls");
             response.setContentType("application/vnd.ms-excel");
             OutputStream excelFileDownload = response.getOutputStream();
             FileInputStream fileInputStream = new FileInputStream(xlsFile);
@@ -183,6 +180,7 @@ public class ParametizedReportFormController {
             fileInputStream.close();
             excelFileDownload.flush();
             excelFileDownload.close();
+            xlsFile.delete();
 
         }  catch (Exception e){
             e.printStackTrace();
@@ -242,7 +240,7 @@ public class ParametizedReportFormController {
             renderer.render(reportData, "reportManagement", stream);
             stream.close();
 
-            response.setHeader("Content-disposition", "attachment; filename=" + "sampleDoc" + ".xls");
+            response.setHeader("Content-disposition", "attachment; filename=" + "patientMgtReport" + ".xls");
             response.setContentType("application/vnd.ms-excel");
             OutputStream excelFileDownload = response.getOutputStream();
             FileInputStream fileInputStream = new FileInputStream(xlsFile);
@@ -251,7 +249,7 @@ public class ParametizedReportFormController {
             fileInputStream.close();
             excelFileDownload.flush();
             excelFileDownload.close();
-
+            xlsFile.delete();
         }  catch (Exception e){
             e.printStackTrace();
 
@@ -310,7 +308,7 @@ public class ParametizedReportFormController {
             renderer.render(reportData, "reportManagement", stream);
             stream.close();
 
-            response.setHeader("Content-disposition", "attachment; filename=" + "sampleDoc" + ".xls");
+            response.setHeader("Content-disposition", "attachment; filename=" + "patientMgtReport" + ".xls");
             response.setContentType("application/vnd.ms-excel");
             OutputStream excelFileDownload = response.getOutputStream();
             FileInputStream fileInputStream = new FileInputStream(xlsFile);
@@ -319,7 +317,7 @@ public class ParametizedReportFormController {
             fileInputStream.close();
             excelFileDownload.flush();
             excelFileDownload.close();
-
+            xlsFile.delete();
         }  catch (Exception e){
             e.printStackTrace();
 
@@ -378,7 +376,7 @@ public class ParametizedReportFormController {
             renderer.render(reportData, "reportManagement", stream);
             stream.close();
 
-            response.setHeader("Content-disposition", "attachment; filename=" + "sampleDoc" + ".xls");
+            response.setHeader("Content-disposition", "attachment; filename=" + "patientMgtReport" + ".xls");
             response.setContentType("application/vnd.ms-excel");
             OutputStream excelFileDownload = response.getOutputStream();
             FileInputStream fileInputStream = new FileInputStream(xlsFile);
@@ -387,7 +385,137 @@ public class ParametizedReportFormController {
             fileInputStream.close();
             excelFileDownload.flush();
             excelFileDownload.close();
+            xlsFile.delete();
+        }  catch (Exception e){
+            e.printStackTrace();
 
+            throw new RuntimeException("There was a problem running this report!!!!");
+        }
+
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "adultsTBHIVCoinfectedReport")
+    public void adultHIVandTBPatients( HttpServletRequest request, HttpServletResponse response ) throws Exception {
+
+        String effectiveDate = request.getParameter("evaluationDate");
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date startDate = sdf.parse(effectiveDate);
+
+        Date endDate = new Date();
+
+        HIVandTBPatientsNOTOnARTReport queuedReport = new HIVandTBPatientsNOTOnARTReport();
+        queuedReport.setMaxAge(200);
+        queuedReport.setMinAge(15);
+
+        try{
+            CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
+            cohortDefinition.addParameter(new Parameter("effectiveDate", "Effective Date", Date.class));
+            cohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+            cohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
+
+            ReportDefinition reportDefinition = queuedReport.getReportDefinition();
+            EvaluationContext evaluationContext = new EvaluationContext();
+            evaluationContext.setEvaluationDate(endDate);
+            evaluationContext.addParameterValue("effectiveDate",endDate);
+            evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), startDate);
+            evaluationContext.addParameterValue(ReportingConstants.END_DATE_PARAMETER.getName(), endDate);
+            // get the cohort
+            CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
+            Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
+            evaluationContext.setBaseCohort(cohort);
+
+            ReportData reportData = Context.getService(ReportDefinitionService.class)
+                    .evaluate(reportDefinition, evaluationContext);
+
+            File xlsFile = File.createTempFile("patient_mgt_rpt", ".xls");
+            OutputStream stream = new BufferedOutputStream(new FileOutputStream(xlsFile));
+
+            final ReportDesign design = queuedReport.getReportDesign();
+            ExcelTemplateRenderer renderer = new ExcelTemplateRenderer() {
+                public ReportDesign getDesign(String argument) {
+                    return design;
+                }
+            };
+            renderer.render(reportData, "reportManagement", stream);
+            stream.close();
+
+            response.setHeader("Content-disposition", "attachment; filename=" + "patientMgtReport" + ".xls");
+            response.setContentType("application/vnd.ms-excel");
+            OutputStream excelFileDownload = response.getOutputStream();
+            FileInputStream fileInputStream = new FileInputStream(xlsFile);
+
+            IOUtils.copy(fileInputStream, excelFileDownload);
+            fileInputStream.close();
+            excelFileDownload.flush();
+            excelFileDownload.close();
+            xlsFile.delete();
+        }  catch (Exception e){
+            e.printStackTrace();
+
+            throw new RuntimeException("There was a problem running this report!!!!");
+        }
+
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "adultPatientsNotOnART")
+    public void adultPatientsNotOnART( HttpServletRequest request, HttpServletResponse response ) throws Exception {
+
+        String effectiveDate = request.getParameter("evaluationDate");
+        Double maxCD4 = Double.valueOf(request.getParameter("adultsMaxCD4noPreg"));
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date startDate = sdf.parse(effectiveDate);
+
+        Date endDate = new Date();
+
+        AdultsNotOnARTCD4Report queuedReport = new AdultsNotOnARTCD4Report();
+        queuedReport.setMaxAge(200);
+        queuedReport.setMinAge(15);
+        queuedReport.setValue1(maxCD4);
+
+        try{
+            CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
+            cohortDefinition.addParameter(new Parameter("effectiveDate", "Effective Date", Date.class));
+            cohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
+            cohortDefinition.addParameter(new Parameter("startDate", "After Date", Date.class));
+
+            ReportDefinition reportDefinition = queuedReport.getReportDefinition();
+            EvaluationContext evaluationContext = new EvaluationContext();
+            evaluationContext.setEvaluationDate(endDate);
+            evaluationContext.addParameterValue("effectiveDate",endDate);
+            evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), startDate);
+            evaluationContext.addParameterValue(ReportingConstants.END_DATE_PARAMETER.getName(), endDate);
+            // get the cohort
+            CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
+            Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
+            evaluationContext.setBaseCohort(cohort);
+
+            ReportData reportData = Context.getService(ReportDefinitionService.class)
+                    .evaluate(reportDefinition, evaluationContext);
+
+            File xlsFile = File.createTempFile("patient_mgt_rpt", ".xls");
+            OutputStream stream = new BufferedOutputStream(new FileOutputStream(xlsFile));
+
+            final ReportDesign design = queuedReport.getReportDesign();
+            ExcelTemplateRenderer renderer = new ExcelTemplateRenderer() {
+                public ReportDesign getDesign(String argument) {
+                    return design;
+                }
+            };
+            renderer.render(reportData, "reportManagement", stream);
+            stream.close();
+
+            response.setHeader("Content-disposition", "attachment; filename=" + "patientMgtReport" + ".xls");
+            response.setContentType("application/vnd.ms-excel");
+            OutputStream excelFileDownload = response.getOutputStream();
+            FileInputStream fileInputStream = new FileInputStream(xlsFile);
+
+            IOUtils.copy(fileInputStream, excelFileDownload);
+            fileInputStream.close();
+            excelFileDownload.flush();
+            excelFileDownload.close();
+            xlsFile.delete();
         }  catch (Exception e){
             e.printStackTrace();
 
@@ -451,58 +579,5 @@ public class ParametizedReportFormController {
 		return FORM_VIEW;
 	}
 
-    @RequestMapping(method = RequestMethod.GET, value = "module/amrsreports/removeQueuedParametizedReport.form")
-    public String removeQueuedReport( HttpServletRequest request,
-            @RequestParam(value = "queuedReportId", required = false) Integer queuedReportId,
-            ModelMap modelMap
-    ) {
-
-        HttpSession httpSession = request.getSession();
-        QueuedReportService queuedReportService = Context.getService(QueuedReportService.class);
-
-        QueuedReport queuedReport = null;
-
-
-        if (queuedReportId != null)
-            queuedReport = Context.getService(QueuedReportService.class).getQueuedReport(queuedReportId);
-
-
-
-        try {
-            queuedReportService.purgeQueuedReport(queuedReport);
-            httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "The report was successfully removed");
-            return SUCCESS_VIEW;
-        }
-        catch (DataIntegrityViolationException e) {
-            httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "error.object.inuse.cannot.purge");
-            return FORM_VIEW;
-        }
-        catch (APIException e) {
-            httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "error.general: " + e.getLocalizedMessage());
-            return FORM_VIEW;
-        }
-
-    }
-
-	@InitBinder
-	private void dateBinder(WebDataBinder binder) {
-		// The date format to parse or output your dates
-		SimpleDateFormat dateFormat = Context.getDateFormat();
-        //SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
-		// Another date format for datetime
-		SimpleDateFormat datetimeFormat = new SimpleDateFormat("dd/mm/yyyy");
-
-		binder.registerCustomEditor(Date.class, new CustomDateEditor(datetimeFormat, true));
-	}
-
-    @InitBinder
-    private void dateBinderTwo(WebDataBinder binder) {
-        // The date format to parse or output your dates
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/mm/yyyy");
-
-        // Register them as custom editors for the Date type
-        binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat,true));
-    }
 
 }

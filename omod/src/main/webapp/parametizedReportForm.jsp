@@ -128,7 +128,7 @@
                 </tr>
                 <tr>
                     <td colspan="2">
-                        All patients with CD4 <  <input type="text" name="adultsMaxCD4noPreg" size="4" /> ml (irrespective of pregnancy) not on ART &nbsp;&nbsp;&nbsp;&nbsp;<input id="adultsMaxCD4noPregReport" name="adultsMaxCD4noPregReport" type="submit" value="  +  " />
+                        All patients with CD4 <  <input type="text" name="adultsMaxCD4noPreg" size="4" /> ml (irrespective of pregnancy) not on ART &nbsp;&nbsp;&nbsp;&nbsp;<input id="adultPatientsNotOnART" name="adultPatientsNotOnART" type="submit" value="  +  " />
                     </td>
                 </tr>
                 <tr>
