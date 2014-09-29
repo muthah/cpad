@@ -55,6 +55,509 @@ public class ParametizedReportFormController {
 	private static final String FORM_VIEW = "module/amrsreports/parametizedReportForm";
 	private static final String SUCCESS_VIEW = "redirect:queuedReport.list";
 
+	/**
+	 * adultsPersistence
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "adultsPersistence")
+	public void generateAdultsPersistence(HttpServletRequest request, HttpServletResponse response ) throws Exception {
+
+		Integer persistence = Integer.valueOf(request.getParameter("adultPersistencetimes"));
+		Double maxCd4 = Double.valueOf(request.getParameter("adt_maxcd4"));
+		Integer no_of_months = Integer.valueOf(request.getParameter("adt_noOfMonths"));
+
+		Integer maxAge = Integer.valueOf(request.getParameter("childrenNotInHaartAgeInM"));
+		String effectiveDate = request.getParameter("evaluationDate");
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		Date startDate = sdf.parse(effectiveDate);
+		Date endDate = new Date();
+
+		ChildrenNotInHAARTReport queuedReport = new ChildrenNotInHAARTReport();
+		queuedReport.setMaxAge(maxAge);
+
+		try{
+			CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
+			cohortDefinition.addParameter(new Parameter("effectiveDate", "Effective Date", Date.class));
+
+			ReportDefinition reportDefinition = queuedReport.getReportDefinition();
+			EvaluationContext evaluationContext = new EvaluationContext();
+			evaluationContext.setEvaluationDate(endDate);
+			evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), startDate);
+			evaluationContext.addParameterValue(ReportingConstants.END_DATE_PARAMETER.getName(), endDate);
+			// get the cohort
+			CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
+			Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
+			evaluationContext.setBaseCohort(cohort);
+
+			ReportData reportData = Context.getService(ReportDefinitionService.class)
+					.evaluate(reportDefinition, evaluationContext);
+
+			File xlsFile = File.createTempFile("patient_mgt_rpt", ".xls");
+			OutputStream stream = new BufferedOutputStream(new FileOutputStream(xlsFile));
+
+			final ReportDesign design = queuedReport.getReportDesign();
+			ExcelTemplateRenderer renderer = new ExcelTemplateRenderer() {
+				public ReportDesign getDesign(String argument) {
+					return design;
+				}
+			};
+			renderer.render(reportData, "reportManagement", stream);
+			stream.close();
+
+			response.setHeader("Content-disposition", "attachment; filename=" + "patientMgtReport" + ".xls");
+			response.setContentType("application/vnd.ms-excel");
+			OutputStream excelFileDownload = response.getOutputStream();
+			FileInputStream fileInputStream = new FileInputStream(xlsFile);
+
+			IOUtils.copy(fileInputStream, excelFileDownload);
+			fileInputStream.close();
+			excelFileDownload.flush();
+			excelFileDownload.close();
+			xlsFile.delete();
+		}  catch (Exception e){
+			e.printStackTrace();
+
+			throw new RuntimeException("There was a problem running this report!!!!");
+		}
+
+
+
+		//================================
+
+		//httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Please wait as the report is processed." + persistencetimes + " ==" + effectiveDate);
+
+		//return SUCCESS_VIEW;
+	}
+
+
+	/**
+	 * adult cd4 drop below pre-treatment baseline
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "adultCd4DropBelowPreTreatmentReport")
+	public void adultCd4DropBelowPreTreatmentBaseline(HttpServletRequest request, HttpServletResponse response ) throws Exception {
+
+		Integer persistence = Integer.valueOf(request.getParameter("adultPersistencetimes"));
+		Double maxCd4 = Double.valueOf(request.getParameter("adt_maxcd4"));
+		Integer no_of_months = Integer.valueOf(request.getParameter("adult_cd4_below_pretreatment_no_of_months"));
+
+		Integer maxAge = Integer.valueOf(request.getParameter("childrenNotInHaartAgeInM"));
+		String effectiveDate = request.getParameter("evaluationDate");
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		Date startDate = sdf.parse(effectiveDate);
+		Date endDate = new Date();
+
+		ChildrenNotInHAARTReport queuedReport = new ChildrenNotInHAARTReport();
+		queuedReport.setMaxAge(maxAge);
+
+		try{
+			CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
+			cohortDefinition.addParameter(new Parameter("effectiveDate", "Effective Date", Date.class));
+
+			ReportDefinition reportDefinition = queuedReport.getReportDefinition();
+			EvaluationContext evaluationContext = new EvaluationContext();
+			evaluationContext.setEvaluationDate(endDate);
+			evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), startDate);
+			evaluationContext.addParameterValue(ReportingConstants.END_DATE_PARAMETER.getName(), endDate);
+			// get the cohort
+			CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
+			Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
+			evaluationContext.setBaseCohort(cohort);
+
+			ReportData reportData = Context.getService(ReportDefinitionService.class)
+					.evaluate(reportDefinition, evaluationContext);
+
+			File xlsFile = File.createTempFile("patient_mgt_rpt", ".xls");
+			OutputStream stream = new BufferedOutputStream(new FileOutputStream(xlsFile));
+
+			final ReportDesign design = queuedReport.getReportDesign();
+			ExcelTemplateRenderer renderer = new ExcelTemplateRenderer() {
+				public ReportDesign getDesign(String argument) {
+					return design;
+				}
+			};
+			renderer.render(reportData, "reportManagement", stream);
+			stream.close();
+
+			response.setHeader("Content-disposition", "attachment; filename=" + "patientMgtReport" + ".xls");
+			response.setContentType("application/vnd.ms-excel");
+			OutputStream excelFileDownload = response.getOutputStream();
+			FileInputStream fileInputStream = new FileInputStream(xlsFile);
+
+			IOUtils.copy(fileInputStream, excelFileDownload);
+			fileInputStream.close();
+			excelFileDownload.flush();
+			excelFileDownload.close();
+			xlsFile.delete();
+		}  catch (Exception e){
+			e.printStackTrace();
+
+			throw new RuntimeException("There was a problem running this report!!!!");
+		}
+
+	}
+
+	/**
+	 * adults whose cd4 count failed to surpass pre-treatment baseline
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "adultsCd4DropPercentage")
+	public void adultPercCd4DropBelowPreTreatmentBaseline(HttpServletRequest request, HttpServletResponse response ) throws Exception {
+
+		Integer adult_perc_cd4_baseline = Integer.valueOf(request.getParameter("adult_perc_cd4drop_param"));
+
+		Integer maxAge = Integer.valueOf(request.getParameter("childrenNotInHaartAgeInM"));
+		String effectiveDate = request.getParameter("evaluationDate");
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		Date startDate = sdf.parse(effectiveDate);
+		Date endDate = new Date();
+
+		ChildrenNotInHAARTReport queuedReport = new ChildrenNotInHAARTReport();
+		queuedReport.setMaxAge(maxAge);
+
+		try{
+			CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
+			cohortDefinition.addParameter(new Parameter("effectiveDate", "Effective Date", Date.class));
+
+			ReportDefinition reportDefinition = queuedReport.getReportDefinition();
+			EvaluationContext evaluationContext = new EvaluationContext();
+			evaluationContext.setEvaluationDate(endDate);
+			evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), startDate);
+			evaluationContext.addParameterValue(ReportingConstants.END_DATE_PARAMETER.getName(), endDate);
+			// get the cohort
+			CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
+			Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
+			evaluationContext.setBaseCohort(cohort);
+
+			ReportData reportData = Context.getService(ReportDefinitionService.class)
+					.evaluate(reportDefinition, evaluationContext);
+
+			File xlsFile = File.createTempFile("patient_mgt_rpt", ".xls");
+			OutputStream stream = new BufferedOutputStream(new FileOutputStream(xlsFile));
+
+			final ReportDesign design = queuedReport.getReportDesign();
+			ExcelTemplateRenderer renderer = new ExcelTemplateRenderer() {
+				public ReportDesign getDesign(String argument) {
+					return design;
+				}
+			};
+			renderer.render(reportData, "reportManagement", stream);
+			stream.close();
+
+			response.setHeader("Content-disposition", "attachment; filename=" + "patientMgtReport" + ".xls");
+			response.setContentType("application/vnd.ms-excel");
+			OutputStream excelFileDownload = response.getOutputStream();
+			FileInputStream fileInputStream = new FileInputStream(xlsFile);
+
+			IOUtils.copy(fileInputStream, excelFileDownload);
+			fileInputStream.close();
+			excelFileDownload.flush();
+			excelFileDownload.close();
+			xlsFile.delete();
+		}  catch (Exception e){
+			e.printStackTrace();
+
+			throw new RuntimeException("There was a problem running this report!!!!");
+		}
+
+	}
+
+	//================================================= peds treatment failure reports ============================================================
+
+	/**
+	 * peds report one
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "ped_tf_rpt1")
+	public void ped_tf_rpt1(HttpServletRequest request, HttpServletResponse response ) throws Exception {
+
+		Integer ped_tf_rpt1_min_age = Integer.valueOf(request.getParameter("ped_tf_rpt1_min_age"));
+		Integer ped_tf_rpt1_max_age = Integer.valueOf(request.getParameter("ped_tf_rpt1_max_age"));
+		Double ped_tf_rpt1_max_cd4 = Double.valueOf(request.getParameter("ped_tf_rpt1_max_cd4"));
+		Integer ped_tf_rpt1_months = Integer.valueOf(request.getParameter("ped_tf_rpt1_months"));
+
+		Integer maxAge = Integer.valueOf(request.getParameter("childrenNotInHaartAgeInM"));
+		String effectiveDate = request.getParameter("evaluationDate");
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		Date startDate = sdf.parse(effectiveDate);
+		Date endDate = new Date();
+
+		ChildrenNotInHAARTReport queuedReport = new ChildrenNotInHAARTReport();
+		queuedReport.setMaxAge(maxAge);
+
+		try{
+			CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
+			cohortDefinition.addParameter(new Parameter("effectiveDate", "Effective Date", Date.class));
+
+			ReportDefinition reportDefinition = queuedReport.getReportDefinition();
+			EvaluationContext evaluationContext = new EvaluationContext();
+			evaluationContext.setEvaluationDate(endDate);
+			evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), startDate);
+			evaluationContext.addParameterValue(ReportingConstants.END_DATE_PARAMETER.getName(), endDate);
+			// get the cohort
+			CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
+			Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
+			evaluationContext.setBaseCohort(cohort);
+
+			ReportData reportData = Context.getService(ReportDefinitionService.class)
+					.evaluate(reportDefinition, evaluationContext);
+
+			File xlsFile = File.createTempFile("patient_mgt_rpt", ".xls");
+			OutputStream stream = new BufferedOutputStream(new FileOutputStream(xlsFile));
+
+			final ReportDesign design = queuedReport.getReportDesign();
+			ExcelTemplateRenderer renderer = new ExcelTemplateRenderer() {
+				public ReportDesign getDesign(String argument) {
+					return design;
+				}
+			};
+			renderer.render(reportData, "reportManagement", stream);
+			stream.close();
+
+			response.setHeader("Content-disposition", "attachment; filename=" + "patientMgtReport" + ".xls");
+			response.setContentType("application/vnd.ms-excel");
+			OutputStream excelFileDownload = response.getOutputStream();
+			FileInputStream fileInputStream = new FileInputStream(xlsFile);
+
+			IOUtils.copy(fileInputStream, excelFileDownload);
+			fileInputStream.close();
+			excelFileDownload.flush();
+			excelFileDownload.close();
+			xlsFile.delete();
+		}  catch (Exception e){
+			e.printStackTrace();
+
+			throw new RuntimeException("There was a problem running this report!!!!");
+		}
+
+	}
+
+	/**
+	 * peds report two: takes age params in years
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "ped_tf_rpt2")
+	public void ped_tf_rpt2(HttpServletRequest request, HttpServletResponse response ) throws Exception {
+
+		Integer ped_tf_rpt2_min_age = Integer.valueOf(request.getParameter("ped_tf_rpt2_min_age"));
+		Double ped_tf_rpt2_max_cd4 = Double.valueOf(request.getParameter("ped_tf_rpt2_max_cd4"));
+		Integer ped_tf_rpt2_months = Integer.valueOf(request.getParameter("ped_tf_rpt2_months"));
+
+		Integer maxAge = Integer.valueOf(request.getParameter("childrenNotInHaartAgeInM"));
+		String effectiveDate = request.getParameter("evaluationDate");
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		Date startDate = sdf.parse(effectiveDate);
+		Date endDate = new Date();
+
+		ChildrenNotInHAARTReport queuedReport = new ChildrenNotInHAARTReport();
+		queuedReport.setMaxAge(maxAge);
+
+		try{
+			CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
+			cohortDefinition.addParameter(new Parameter("effectiveDate", "Effective Date", Date.class));
+
+			ReportDefinition reportDefinition = queuedReport.getReportDefinition();
+			EvaluationContext evaluationContext = new EvaluationContext();
+			evaluationContext.setEvaluationDate(endDate);
+			evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), startDate);
+			evaluationContext.addParameterValue(ReportingConstants.END_DATE_PARAMETER.getName(), endDate);
+			// get the cohort
+			CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
+			Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
+			evaluationContext.setBaseCohort(cohort);
+
+			ReportData reportData = Context.getService(ReportDefinitionService.class)
+					.evaluate(reportDefinition, evaluationContext);
+
+			File xlsFile = File.createTempFile("patient_mgt_rpt", ".xls");
+			OutputStream stream = new BufferedOutputStream(new FileOutputStream(xlsFile));
+
+			final ReportDesign design = queuedReport.getReportDesign();
+			ExcelTemplateRenderer renderer = new ExcelTemplateRenderer() {
+				public ReportDesign getDesign(String argument) {
+					return design;
+				}
+			};
+			renderer.render(reportData, "reportManagement", stream);
+			stream.close();
+
+			response.setHeader("Content-disposition", "attachment; filename=" + "patientMgtReport" + ".xls");
+			response.setContentType("application/vnd.ms-excel");
+			OutputStream excelFileDownload = response.getOutputStream();
+			FileInputStream fileInputStream = new FileInputStream(xlsFile);
+
+			IOUtils.copy(fileInputStream, excelFileDownload);
+			fileInputStream.close();
+			excelFileDownload.flush();
+			excelFileDownload.close();
+			xlsFile.delete();
+		}  catch (Exception e){
+			e.printStackTrace();
+
+			throw new RuntimeException("There was a problem running this report!!!!");
+		}
+
+	}
+
+
+	/**
+	 * peds report 3: report of peds who experienced a decline in cd4 count below pre-treatment baseline
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "ped_tf_rpt3")
+	public void ped_tf_rpt3(HttpServletRequest request, HttpServletResponse response ) throws Exception {
+
+		Integer ped_tf_rpt3_months = Integer.valueOf(request.getParameter("ped_tf_rpt3_months"));
+
+		Integer maxAge = Integer.valueOf(request.getParameter("childrenNotInHaartAgeInM"));
+		String effectiveDate = request.getParameter("evaluationDate");
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		Date startDate = sdf.parse(effectiveDate);
+		Date endDate = new Date();
+
+		ChildrenNotInHAARTReport queuedReport = new ChildrenNotInHAARTReport();
+		queuedReport.setMaxAge(maxAge);
+
+		try{
+			CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
+			cohortDefinition.addParameter(new Parameter("effectiveDate", "Effective Date", Date.class));
+
+			ReportDefinition reportDefinition = queuedReport.getReportDefinition();
+			EvaluationContext evaluationContext = new EvaluationContext();
+			evaluationContext.setEvaluationDate(endDate);
+			evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), startDate);
+			evaluationContext.addParameterValue(ReportingConstants.END_DATE_PARAMETER.getName(), endDate);
+			// get the cohort
+			CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
+			Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
+			evaluationContext.setBaseCohort(cohort);
+
+			ReportData reportData = Context.getService(ReportDefinitionService.class)
+					.evaluate(reportDefinition, evaluationContext);
+
+			File xlsFile = File.createTempFile("patient_mgt_rpt", ".xls");
+			OutputStream stream = new BufferedOutputStream(new FileOutputStream(xlsFile));
+
+			final ReportDesign design = queuedReport.getReportDesign();
+			ExcelTemplateRenderer renderer = new ExcelTemplateRenderer() {
+				public ReportDesign getDesign(String argument) {
+					return design;
+				}
+			};
+			renderer.render(reportData, "reportManagement", stream);
+			stream.close();
+
+			response.setHeader("Content-disposition", "attachment; filename=" + "patientMgtReport" + ".xls");
+			response.setContentType("application/vnd.ms-excel");
+			OutputStream excelFileDownload = response.getOutputStream();
+			FileInputStream fileInputStream = new FileInputStream(xlsFile);
+
+			IOUtils.copy(fileInputStream, excelFileDownload);
+			fileInputStream.close();
+			excelFileDownload.flush();
+			excelFileDownload.close();
+			xlsFile.delete();
+		}  catch (Exception e){
+			e.printStackTrace();
+
+			throw new RuntimeException("There was a problem running this report!!!!");
+		}
+
+	}
+
+
+
+
+	/**
+	 * peds report 4: report of peds who experienced a decline in cd4 count below a given percentage and failed to regain beyond pre-treatment baseline
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "ped_tf_rpt4")
+	public void ped_tf_rpt4(HttpServletRequest request, HttpServletResponse response ) throws Exception {
+
+		Integer ped_tf_rpt4_cd4_perc = Integer.valueOf(request.getParameter("ped_tf_rpt4_cd4_perc"));
+
+		Integer maxAge = Integer.valueOf(request.getParameter("childrenNotInHaartAgeInM"));
+		String effectiveDate = request.getParameter("evaluationDate");
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		Date startDate = sdf.parse(effectiveDate);
+		Date endDate = new Date();
+
+		ChildrenNotInHAARTReport queuedReport = new ChildrenNotInHAARTReport();
+		queuedReport.setMaxAge(maxAge);
+
+		try{
+			CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
+			cohortDefinition.addParameter(new Parameter("effectiveDate", "Effective Date", Date.class));
+
+			ReportDefinition reportDefinition = queuedReport.getReportDefinition();
+			EvaluationContext evaluationContext = new EvaluationContext();
+			evaluationContext.setEvaluationDate(endDate);
+			evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), startDate);
+			evaluationContext.addParameterValue(ReportingConstants.END_DATE_PARAMETER.getName(), endDate);
+			// get the cohort
+			CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
+			Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
+			evaluationContext.setBaseCohort(cohort);
+
+			ReportData reportData = Context.getService(ReportDefinitionService.class)
+					.evaluate(reportDefinition, evaluationContext);
+
+			File xlsFile = File.createTempFile("patient_mgt_rpt", ".xls");
+			OutputStream stream = new BufferedOutputStream(new FileOutputStream(xlsFile));
+
+			final ReportDesign design = queuedReport.getReportDesign();
+			ExcelTemplateRenderer renderer = new ExcelTemplateRenderer() {
+				public ReportDesign getDesign(String argument) {
+					return design;
+				}
+			};
+			renderer.render(reportData, "reportManagement", stream);
+			stream.close();
+
+			response.setHeader("Content-disposition", "attachment; filename=" + "patientMgtReport" + ".xls");
+			response.setContentType("application/vnd.ms-excel");
+			OutputStream excelFileDownload = response.getOutputStream();
+			FileInputStream fileInputStream = new FileInputStream(xlsFile);
+
+			IOUtils.copy(fileInputStream, excelFileDownload);
+			fileInputStream.close();
+			excelFileDownload.flush();
+			excelFileDownload.close();
+			xlsFile.delete();
+		}  catch (Exception e){
+			e.printStackTrace();
+
+			throw new RuntimeException("There was a problem running this report!!!!");
+		}
+
+	}
+
+
+
+	//================================================ end of peds treatment failure reports
+
 	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "childrenNotInHaartReport")
 	public void childrenNotInHaartIrrespectiveOfCD4Count(HttpServletRequest request, HttpServletResponse response ) throws Exception {
 

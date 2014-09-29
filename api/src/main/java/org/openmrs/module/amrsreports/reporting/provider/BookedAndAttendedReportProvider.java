@@ -91,7 +91,6 @@ public class BookedAndAttendedReportProvider extends ReportProvider {
         dsd.addColumn("attended", art,periodMappings);
 
 		report.addDataSetDefinition(dsd, null);
-
 		return report;
 	}
 

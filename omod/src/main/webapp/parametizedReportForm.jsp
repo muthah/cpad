@@ -108,17 +108,17 @@
                 </tr>
                 <tr>
                     <td colspan="2">
-                        Persistent ( <input type="text" name="adultPersistencetimes" id="adultPersistencetimes" size="4" /> or more ) CD4 counts less than <input type="text" size="4" /> , <input type="text" size="4" /> months or more after initiation of HAART &nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="adultsPersistence" id="adultsPersistence" value="  +  " />
+                        Persistent ( <input type="text" name="adultPersistencetimes" id="adultPersistencetimes" size="4" /> or more ) CD4 counts less than <input type="text" name="adt_maxcd4" id="adt_maxcd4" size="4" /> , <input type="text" name="adt_noOfMonths" id="adt_noOfMonths" size="4" /> months or more after initiation of HAART &nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="adultsPersistence" id="adultsPersistence" value="  +  " />
                     </td>
                 </tr>
                 <tr>
                     <td colspan="2">
-                        CD4 count drop to or below pre-treatment baseline level,  <input type="text" size="4" /> months or more after initiation of HAART &nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="adultsCd4dropBelowPreTreatment" id="adultsCd4dropBelowPreTreatment" value="  +  " />
+                        CD4 count drop to or below pre-treatment baseline level,  <input type="text" size="4" name="adult_cd4_below_pretreatment_no_of_months" /> months or more after initiation of HAART &nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="adultCd4DropBelowPreTreatmentReport" id="adultCd4DropBelowPreTreatmentReport" value="  +  " />
                     </td>
                 </tr>
                 <tr>
                     <td colspan="2">
-                        CD4 count drop of  <input type="text" size="4" /> % (or more from on-treatment peak value during the follow-up period. Subsequent CD4 counts (after drop) failed to reach peak level ever attained on HAART &nbsp;&nbsp;&nbsp;&nbsp;<input name="adultsCd4DropPercentage" id="adultsCd4DropPercentage" type="submit" value="  +  " />
+                        CD4 count drop of  <input type="text" name="adult_perc_cd4drop_param" size="4" /> % (or more from on-treatment peak value during the follow-up period. Subsequent CD4 counts (after drop) failed to reach peak level ever attained on HAART &nbsp;&nbsp;&nbsp;&nbsp;<input name="adultsCd4DropPercentage" id="adultsCd4DropPercentage" type="submit" value="  +  " />
                     </td>
                 </tr>
                 <tr>
@@ -161,21 +161,21 @@
                 </tr>
                 <tr>
                     <td colspan="2">
-                        Children aged <input type="text" size="4" name="childminmonths" id="childminmonths" /> - <input type="text" size="4" name="childmaxmonths" id="childmaxmonths"/> months with absolute CD4 counts of <input type="text" size="4" name="childabscd4max" id="childabscd4max"/> (or below), <input type="text" size="4" /> months or more after initiation of HAART &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="  +  " />
+                        Children aged <input type="text" size="4" name="ped_tf_rpt1_min_age"  /> - <input type="text" size="4" name="ped_tf_rpt1_max_age" /> months with absolute CD4 counts of <input type="text" size="4" name="ped_tf_rpt1_max_cd4" /> (or below), <input type="text" name="ped_tf_rpt1_months" size="4" /> months or more after initiation of HAART &nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="ped_tf_rpt1" value="  +  " />
                     </td>
                 </tr>
                 <tr>
                     <td colspan="2">
-                       Children older than  <input type="text" size="4" name="childrenolderthann" /> years with CD4 counts of <input type="text" size="4" name="childrenolderthan" /> (or below), <input type="text" size="4" /> months or more after initiation of HAART    &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="  +  " />                </td>
+                       Children older than  <input type="text" size="4" name="ped_tf_rpt2_min_age" /> years with CD4 counts of <input type="text" size="4" name="ped_tf_rpt2_max_cd4" /> (or below), <input type="text" name="ped_tf_rpt2_months" size="4" /> months or more after initiation of HAART    &nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="ped_tf_rpt2" value="  +  " />                </td>
                 </tr>
                 <tr>
                     <td colspan="2">
-                        CD4 count drop to or below pre-treatment baseline level,  <input type="text" size="4" /> months or more after initiation of HAART   &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="  +  " />
+                        CD4 count drop to or below pre-treatment baseline level,  <input type="text" name="ped_tf_rpt3_months" size="4" /> months or more after initiation of HAART   &nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="ped_tf_rpt3" value="  +  " />
                     </td>
                 </tr>
                 <tr>
                     <td colspan="2">
-                        CD4 count drop of <input type="text" size="4" /> % (or more) from on-treatment peak value during the follow-up period. Subsequent CD4 counts (after drop) failed to reach peak level ever attained on HAART  &nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="  +  " />
+                        CD4 count drop of <input type="text" name="ped_tf_rpt4_cd4_perc" size="4" /> % (or more) from on-treatment peak value during the follow-up period. Subsequent CD4 counts (after drop) failed to reach peak level ever attained on HAART  &nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="ped_tf_rpt4" value="  +  " />
                     </td>
                 </tr>
                 <tr>
