@@ -30,22 +30,22 @@ public class AttendanceIndicatorLibrary {
 
     //new patients
     public CohortIndicator malesBelow15NewEnrollment() {
-        return CommonIndicatorLibrary.createCohortIndicator("Males below 15 newly enrolled",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Males below 15 newly enrolled",
                 ReportUtils.map(baseCohorts.malesBelow15NewEnrollment(14), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator femalesBelow15NewEnrollment() {
-        return CommonIndicatorLibrary.createCohortIndicator("Females below 15 newly enrolled",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Females below 15 newly enrolled",
                 ReportUtils.map(baseCohorts.femalesBelow15NewEnrollment(14), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator malesAbove15NewEnrollment() {
-        return CommonIndicatorLibrary.createCohortIndicator("Males 15 and above newly enrolled",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Males 15 and above newly enrolled",
                 ReportUtils.map(baseCohorts.malesAbove15NewEnrollment(15), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator femalesAbove15NewEnrollment() {
-        return CommonIndicatorLibrary.createCohortIndicator("Females 15 and above newly enrolled",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Females 15 and above newly enrolled",
                 ReportUtils.map(baseCohorts.femalesAbove15NewEnrollment(15), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
@@ -54,22 +54,22 @@ public class AttendanceIndicatorLibrary {
      * @return
      */
     public CohortIndicator malesBelow15WithRevisits() {
-        return CommonIndicatorLibrary.createCohortIndicator("Males below 15 with revisits",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Males below 15 with revisits",
                 ReportUtils.map(baseCohorts.malesBelow15WithRevisits(14), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator femalesBelow15WithRevisits() {
-        return CommonIndicatorLibrary.createCohortIndicator("Females below 15 with revisits",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Females below 15 with revisits",
                 ReportUtils.map(baseCohorts.femalesBelow15WithRevisits(14), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator malesAbove15WithRevisits() {
-        return CommonIndicatorLibrary.createCohortIndicator("Males 15 and above with revisits",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Males 15 and above with revisits",
                 ReportUtils.map(baseCohorts.malesAbove15WithRevisits(15), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator femalesAbove15WithRevisits() {
-        return CommonIndicatorLibrary.createCohortIndicator("Females 15 and above with revisits",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Females 15 and above with revisits",
                 ReportUtils.map(baseCohorts.femalesAbove15WithRevisits(15), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 

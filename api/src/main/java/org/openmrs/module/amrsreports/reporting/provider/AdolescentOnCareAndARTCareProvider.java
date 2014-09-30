@@ -3,7 +3,7 @@ package org.openmrs.module.amrsreports.reporting.provider;
 import org.apache.commons.io.IOUtils;
 import org.openmrs.Location;
 import org.openmrs.api.APIException;
-import org.openmrs.module.amrsreports.reporting.CommonIndicatorLibrary;
+import org.openmrs.module.amrsreports.reporting.ICAPCommonIndicatorLibrary;
 import org.openmrs.module.amrsreports.reporting.ReportUtils;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.CCCPatientCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.indicatorsSQLLib.ArtCare.ArtCare20SQLCohortLibrary;
@@ -74,21 +74,21 @@ public class AdolescentOnCareAndARTCareProvider extends ReportProvider {
 
 
         //Indicators for Care
-        CohortIndicator cummulativeMalesCohortind = CommonIndicatorLibrary.createCohortIndicator("cummulativeMalesCohortIndicator", ReportUtils.map(cummulativeMalesCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator cummulativeFemalesCohortind = CommonIndicatorLibrary.createCohortIndicator("cummulativeFemalesCohortIndicator", ReportUtils.map(cummulativeFemalesCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator cummulativeMalesCohortind = ICAPCommonIndicatorLibrary.createCohortIndicator("cummulativeMalesCohortIndicator", ReportUtils.map(cummulativeMalesCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator cummulativeFemalesCohortind = ICAPCommonIndicatorLibrary.createCohortIndicator("cummulativeFemalesCohortIndicator", ReportUtils.map(cummulativeFemalesCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
 
-        CohortIndicator malesEnrolledCohortInd = CommonIndicatorLibrary.createCohortIndicator("malesEnrolledCohortIndicator", ReportUtils.map(malesEnrolledCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator femalesEnrolledCohortInd = CommonIndicatorLibrary.createCohortIndicator("femalesEnrolledCohortIndicator", ReportUtils.map(femalesEnrolledCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator malesEnrolledCohortInd = ICAPCommonIndicatorLibrary.createCohortIndicator("malesEnrolledCohortIndicator", ReportUtils.map(malesEnrolledCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator femalesEnrolledCohortInd = ICAPCommonIndicatorLibrary.createCohortIndicator("femalesEnrolledCohortIndicator", ReportUtils.map(femalesEnrolledCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
 
         //indicators for ART
-        CohortIndicator malesTransfersCohortInd = CommonIndicatorLibrary.createCohortIndicator("transferMalesCohortIndicator", ReportUtils.map(malesTransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator femalesTransfersCohortInd = CommonIndicatorLibrary.createCohortIndicator("transferFemalesCohortIndicator", ReportUtils.map(femalesTransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator malesTransfersCohortInd = ICAPCommonIndicatorLibrary.createCohortIndicator("transferMalesCohortIndicator", ReportUtils.map(malesTransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator femalesTransfersCohortInd = ICAPCommonIndicatorLibrary.createCohortIndicator("transferFemalesCohortIndicator", ReportUtils.map(femalesTransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
 
-        CohortIndicator cummulativeMalesARTCohortind = CommonIndicatorLibrary.createCohortIndicator("cummulativeMalesARTCohortIndicator", ReportUtils.map(cummulativeMalesARTCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator cummulativeFemalesARTCohortind = CommonIndicatorLibrary.createCohortIndicator("cummulativeFemalesARTCohortIndicator", ReportUtils.map(cummulativeFemalesARTCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator cummulativeMalesARTCohortind = ICAPCommonIndicatorLibrary.createCohortIndicator("cummulativeMalesARTCohortIndicator", ReportUtils.map(cummulativeMalesARTCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator cummulativeFemalesARTCohortind = ICAPCommonIndicatorLibrary.createCohortIndicator("cummulativeFemalesARTCohortIndicator", ReportUtils.map(cummulativeFemalesARTCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
 
-        CohortIndicator malesEnrolledARTCohortInd = CommonIndicatorLibrary.createCohortIndicator("malesEnrolledARTCohortIndicator", ReportUtils.map(malesEnrolledARTCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator femalesEnrolledARTCohortInd = CommonIndicatorLibrary.createCohortIndicator("femalesEnrolledARTCohortIndicator", ReportUtils.map(femalesEnrolledARTCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator malesEnrolledARTCohortInd = ICAPCommonIndicatorLibrary.createCohortIndicator("malesEnrolledARTCohortIndicator", ReportUtils.map(malesEnrolledARTCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator femalesEnrolledARTCohortInd = ICAPCommonIndicatorLibrary.createCohortIndicator("femalesEnrolledARTCohortIndicator", ReportUtils.map(femalesEnrolledARTCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
 
 
 

@@ -14,14 +14,12 @@
 
 package org.openmrs.module.amrsreports.reporting;
 
-import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.Program;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -30,29 +28,11 @@ import java.util.Date;
  * Library of common indicator definitions. All indicators require parameters ${startDate} and ${endDate}
  */
 @Component
-public class CommonIndicatorLibrary {
+public class ICAPCommonIndicatorLibrary {
 
 
 	CommonICAPCohortLibrary commonCohorts = new CommonICAPCohortLibrary();
 
-	/**
-	 * Number of patients enrolled in the given program (including transfers)
-	 * @param program the program
-	 * @return the indicator
-	 */
-	public CohortIndicator enrolled(Program program) {
-		return createCohortIndicator("Number of new patients enrolled in " + program.getName() + " including transfers",
-				ReportUtils.map(commonCohorts.enrolledExcludingTransfers(program), "onOrAfter=${startDate},onOrBefore=${endDate}"));
-	}
-	/**
-	 * Number of patients enrolled in the given program (excluding transfers)
-	 * @param program the program
-	 * @return the indicator
-	 */
-	public CohortIndicator enrolledExcludingTransfers(Program program) {
-		return createCohortIndicator("Number of new patients enrolled in " + program.getName() + " excluding transfers",
-				ReportUtils.map(commonCohorts.enrolledExcludingTransfers(program), "onOrAfter=${startDate},onOrBefore=${endDate}"));
-	}
 
 	/**
 	 * Number of patients ever enrolled in the given program (including transfers) up to ${endDate}
@@ -64,14 +44,6 @@ public class CommonIndicatorLibrary {
 				ReportUtils.map(commonCohorts.enrolled(program), "enrolledOnOrBefore=${endDate}"));
 	}
 
-	/**
-	 * Number of patients on the specified medication
-	 * @param concepts the drug concepts
-	 * @return the indicator
-	 */
-	public CohortIndicator onMedication(Concept... concepts) {
-		return createCohortIndicator("Number of patients on medication", ReportUtils.map(commonCohorts.onMedication(concepts), "onDate=${endDate}"));
-	}
 
 	/**
 	 * Utility method to create a new cohort indicator

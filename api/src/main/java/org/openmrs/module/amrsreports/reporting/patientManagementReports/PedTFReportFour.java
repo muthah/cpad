@@ -2,9 +2,9 @@ package org.openmrs.module.amrsreports.reporting.patientManagementReports;
 
 import org.apache.commons.io.IOUtils;
 import org.openmrs.api.APIException;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.PatientMgtCohortLibrary;
 import org.openmrs.module.amrsreports.reporting.ReportUtils;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.TreatmentFailureCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ICAPCCCNoDataDefinition;
@@ -31,7 +31,7 @@ import java.util.Properties;
 /**
  * provides CD4 reports for adults and adolescents
  */
-public class ChildrenCD4YNotInHAARTReport {
+public class PedTFReportFour {
 
     private Integer minAge;
     private Integer maxAge;
@@ -70,9 +70,7 @@ public class ChildrenCD4YNotInHAARTReport {
         this.value2 = value2;
     }
 
-	public ReportDefinition getReportDefinition() {
-
-
+    public ReportDefinition getReportDefinition() {
 
 		String nullString = null;
 		ReportDefinition report = new PeriodIndicatorReportDefinition();
@@ -98,26 +96,29 @@ public class ChildrenCD4YNotInHAARTReport {
 
 
 	public CohortDefinition getCohortDefinition() {
+		PatientMgtCohortLibrary library = new PatientMgtCohortLibrary();
+		CohortDefinition cohortDefinition = library.agedAtMostInYears(18);
+		cohortDefinition.setName("Cohort of peds");
+		cohortDefinition.addParameter(new Parameter("effectiveDate", "Effective Date",Date.class));
 
-        PatientMgtCohortLibrary library = new PatientMgtCohortLibrary();
-        CohortDefinition cohortDefinition = library.ageRangeInYears(this.getMinAge(),this.getMaxAge());
-        cohortDefinition.setName("Cohort of children(age in years) not in HAART program and a given CD4 count");
-        cohortDefinition.addParameter(new Parameter("effectiveDate", "Effective Date",Date.class));
+		TreatmentFailureCohortDefinition tfdef = new TreatmentFailureCohortDefinition();
+		tfdef.setName("Treatment Failure Cohort Definition");
+		tfdef.addParameter(new Parameter("startDate", "After Date", Date.class));
+		tfdef.addParameter(new Parameter("endDate", "Before Date", Date.class));
+		tfdef.addParameter(new Parameter("minCd4", "Lower limit for CD4 Count", Double.class));
+		tfdef.addParameter(new Parameter("monthsAfter", "Duration after initiation of HAART", Integer.class));
 
-        CohortDefinition withCD4Obs = library.hasNumericObs(Context.getConceptService().getConcept(5497), this.value1, 1d);
-        withCD4Obs.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-        withCD4Obs.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
+		CompositionCohortDefinition ccd = new CompositionCohortDefinition();
+		ccd.addParameter(new Parameter("endDate", "Before Date", Date.class));
+		ccd.addParameter(new Parameter("startDate", "After Date", Date.class));
+		ccd.addParameter(new Parameter("minCd4", "Lower limit for CD4 Count", Double.class));
+		ccd.addParameter(new Parameter("monthsAfter", "Duration after initiation of HAART", Integer.class));
+		ccd.setName("Composition cohort for peds with x treatment persistence");
+		ccd.addSearch("pedsCohort", ReportUtils.map(cohortDefinition, "effectiveDate=${endDate}"));
+		ccd.addSearch("treatmentFailureCohort", ReportUtils.<CohortDefinition>map(tfdef, "onOrAfter=${startDate},onOrBefore=${endDate}, minCd4=${minCd4},monthsAfter=${monthsAfter}"));
+		ccd.setCompositionString("pedsCohort AND treatmentFailureCohort");
 
-        CompositionCohortDefinition ccd = new CompositionCohortDefinition();
-        ccd.addParameter(new Parameter("endDate", "Before Date", Date.class));
-        ccd.addParameter(new Parameter("startDate", "After Date", Date.class));
-        ccd.addParameter(new Parameter("effectiveDate", "Effective Date",Date.class));
-        ccd.setName("Composition cohort for children with a given CD4 count");
-        ccd.addSearch("childrenCohort", ReportUtils.map(cohortDefinition, "effectiveDate=${effectiveDate}"));
-        ccd.addSearch("cd4countCohort", ReportUtils.map(withCD4Obs, "onOrAfter=${startDate},onOrBefore=${endDate}"));
-        ccd.setCompositionString("childrenCohort AND cd4countCohort");
-
-        return ccd;
+		return ccd;
 	}
 
 

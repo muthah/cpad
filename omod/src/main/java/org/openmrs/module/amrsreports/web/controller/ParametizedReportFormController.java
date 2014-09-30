@@ -67,16 +67,13 @@ public class ParametizedReportFormController {
 		Integer persistence = Integer.valueOf(request.getParameter("adultPersistencetimes"));
 		Double maxCd4 = Double.valueOf(request.getParameter("adt_maxcd4"));
 		Integer no_of_months = Integer.valueOf(request.getParameter("adt_noOfMonths"));
-
-		Integer maxAge = Integer.valueOf(request.getParameter("childrenNotInHaartAgeInM"));
 		String effectiveDate = request.getParameter("evaluationDate");
 
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		Date startDate = sdf.parse(effectiveDate);
 		Date endDate = new Date();
 
-		ChildrenNotInHAARTReport queuedReport = new ChildrenNotInHAARTReport();
-		queuedReport.setMaxAge(maxAge);
+		AdultsTreatmentFailurePersistenceReport queuedReport = new AdultsTreatmentFailurePersistenceReport();
 
 		try{
 			CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
@@ -87,6 +84,9 @@ public class ParametizedReportFormController {
 			evaluationContext.setEvaluationDate(endDate);
 			evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), startDate);
 			evaluationContext.addParameterValue(ReportingConstants.END_DATE_PARAMETER.getName(), endDate);
+			evaluationContext.addParameterValue("minCd4", maxCd4);
+			evaluationContext.addParameterValue("monthsAfter", no_of_months);
+
 			// get the cohort
 			CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
 			Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
@@ -122,14 +122,6 @@ public class ParametizedReportFormController {
 
 			throw new RuntimeException("There was a problem running this report!!!!");
 		}
-
-
-
-		//================================
-
-		//httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Please wait as the report is processed." + persistencetimes + " ==" + effectiveDate);
-
-		//return SUCCESS_VIEW;
 	}
 
 
@@ -145,16 +137,13 @@ public class ParametizedReportFormController {
 		Integer persistence = Integer.valueOf(request.getParameter("adultPersistencetimes"));
 		Double maxCd4 = Double.valueOf(request.getParameter("adt_maxcd4"));
 		Integer no_of_months = Integer.valueOf(request.getParameter("adult_cd4_below_pretreatment_no_of_months"));
-
-		Integer maxAge = Integer.valueOf(request.getParameter("childrenNotInHaartAgeInM"));
 		String effectiveDate = request.getParameter("evaluationDate");
 
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		Date startDate = sdf.parse(effectiveDate);
 		Date endDate = new Date();
 
-		ChildrenNotInHAARTReport queuedReport = new ChildrenNotInHAARTReport();
-		queuedReport.setMaxAge(maxAge);
+		AdultCD4DropBelowPreTreatmentReport queuedReport = new AdultCD4DropBelowPreTreatmentReport();
 
 		try{
 			CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
@@ -165,6 +154,9 @@ public class ParametizedReportFormController {
 			evaluationContext.setEvaluationDate(endDate);
 			evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), startDate);
 			evaluationContext.addParameterValue(ReportingConstants.END_DATE_PARAMETER.getName(), endDate);
+			evaluationContext.addParameterValue("minCd4", maxCd4);
+			evaluationContext.addParameterValue("monthsAfter", no_of_months);
+
 			// get the cohort
 			CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
 			Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
@@ -213,16 +205,14 @@ public class ParametizedReportFormController {
 	public void adultPercCd4DropBelowPreTreatmentBaseline(HttpServletRequest request, HttpServletResponse response ) throws Exception {
 
 		Integer adult_perc_cd4_baseline = Integer.valueOf(request.getParameter("adult_perc_cd4drop_param"));
-
-		Integer maxAge = Integer.valueOf(request.getParameter("childrenNotInHaartAgeInM"));
 		String effectiveDate = request.getParameter("evaluationDate");
 
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		Date startDate = sdf.parse(effectiveDate);
 		Date endDate = new Date();
 
-		ChildrenNotInHAARTReport queuedReport = new ChildrenNotInHAARTReport();
-		queuedReport.setMaxAge(maxAge);
+		AdultCD4DropPercentageReport queuedReport = new AdultCD4DropPercentageReport();
+
 
 		try{
 			CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
@@ -233,6 +223,9 @@ public class ParametizedReportFormController {
 			evaluationContext.setEvaluationDate(endDate);
 			evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), startDate);
 			evaluationContext.addParameterValue(ReportingConstants.END_DATE_PARAMETER.getName(), endDate);
+			evaluationContext.addParameterValue("minCd4", adult_perc_cd4_baseline);
+			evaluationContext.addParameterValue("monthsAfter", 6);
+
 			// get the cohort
 			CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
 			Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
@@ -287,15 +280,16 @@ public class ParametizedReportFormController {
 		Double ped_tf_rpt1_max_cd4 = Double.valueOf(request.getParameter("ped_tf_rpt1_max_cd4"));
 		Integer ped_tf_rpt1_months = Integer.valueOf(request.getParameter("ped_tf_rpt1_months"));
 
-		Integer maxAge = Integer.valueOf(request.getParameter("childrenNotInHaartAgeInM"));
+
 		String effectiveDate = request.getParameter("evaluationDate");
 
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		Date startDate = sdf.parse(effectiveDate);
 		Date endDate = new Date();
 
-		ChildrenNotInHAARTReport queuedReport = new ChildrenNotInHAARTReport();
-		queuedReport.setMaxAge(maxAge);
+		PedTFReportOne queuedReport = new PedTFReportOne();
+		queuedReport.setMaxAge(ped_tf_rpt1_max_age);
+		queuedReport.setMinAge(ped_tf_rpt1_min_age);
 
 		try{
 			CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
@@ -306,6 +300,9 @@ public class ParametizedReportFormController {
 			evaluationContext.setEvaluationDate(endDate);
 			evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), startDate);
 			evaluationContext.addParameterValue(ReportingConstants.END_DATE_PARAMETER.getName(), endDate);
+			evaluationContext.addParameterValue("minCd4", ped_tf_rpt1_max_cd4);
+			evaluationContext.addParameterValue("monthsAfter", ped_tf_rpt1_months);
+
 			// get the cohort
 			CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
 			Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
@@ -356,16 +353,14 @@ public class ParametizedReportFormController {
 		Integer ped_tf_rpt2_min_age = Integer.valueOf(request.getParameter("ped_tf_rpt2_min_age"));
 		Double ped_tf_rpt2_max_cd4 = Double.valueOf(request.getParameter("ped_tf_rpt2_max_cd4"));
 		Integer ped_tf_rpt2_months = Integer.valueOf(request.getParameter("ped_tf_rpt2_months"));
-
-		Integer maxAge = Integer.valueOf(request.getParameter("childrenNotInHaartAgeInM"));
 		String effectiveDate = request.getParameter("evaluationDate");
 
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		Date startDate = sdf.parse(effectiveDate);
 		Date endDate = new Date();
 
-		ChildrenNotInHAARTReport queuedReport = new ChildrenNotInHAARTReport();
-		queuedReport.setMaxAge(maxAge);
+		PedTFReportTwo queuedReport = new PedTFReportTwo();
+		queuedReport.setMinAge(ped_tf_rpt2_min_age);
 
 		try{
 			CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
@@ -376,6 +371,9 @@ public class ParametizedReportFormController {
 			evaluationContext.setEvaluationDate(endDate);
 			evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), startDate);
 			evaluationContext.addParameterValue(ReportingConstants.END_DATE_PARAMETER.getName(), endDate);
+			evaluationContext.addParameterValue("minCd4", ped_tf_rpt2_max_cd4);
+			evaluationContext.addParameterValue("monthsAfter", ped_tf_rpt2_months);
+
 			// get the cohort
 			CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
 			Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
@@ -425,16 +423,14 @@ public class ParametizedReportFormController {
 	public void ped_tf_rpt3(HttpServletRequest request, HttpServletResponse response ) throws Exception {
 
 		Integer ped_tf_rpt3_months = Integer.valueOf(request.getParameter("ped_tf_rpt3_months"));
-
-		Integer maxAge = Integer.valueOf(request.getParameter("childrenNotInHaartAgeInM"));
 		String effectiveDate = request.getParameter("evaluationDate");
 
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		Date startDate = sdf.parse(effectiveDate);
 		Date endDate = new Date();
 
-		ChildrenNotInHAARTReport queuedReport = new ChildrenNotInHAARTReport();
-		queuedReport.setMaxAge(maxAge);
+		PedTFReportThree queuedReport = new PedTFReportThree();
+
 
 		try{
 			CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
@@ -445,6 +441,9 @@ public class ParametizedReportFormController {
 			evaluationContext.setEvaluationDate(endDate);
 			evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), startDate);
 			evaluationContext.addParameterValue(ReportingConstants.END_DATE_PARAMETER.getName(), endDate);
+			evaluationContext.addParameterValue("minCd4", 200.0);
+			evaluationContext.addParameterValue("monthsAfter", ped_tf_rpt3_months);
+
 			// get the cohort
 			CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
 			Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);
@@ -496,16 +495,14 @@ public class ParametizedReportFormController {
 	public void ped_tf_rpt4(HttpServletRequest request, HttpServletResponse response ) throws Exception {
 
 		Integer ped_tf_rpt4_cd4_perc = Integer.valueOf(request.getParameter("ped_tf_rpt4_cd4_perc"));
-
-		Integer maxAge = Integer.valueOf(request.getParameter("childrenNotInHaartAgeInM"));
 		String effectiveDate = request.getParameter("evaluationDate");
 
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		Date startDate = sdf.parse(effectiveDate);
 		Date endDate = new Date();
 
-		ChildrenNotInHAARTReport queuedReport = new ChildrenNotInHAARTReport();
-		queuedReport.setMaxAge(maxAge);
+		PedTFReportFour queuedReport = new PedTFReportFour();
+
 
 		try{
 			CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
@@ -516,6 +513,9 @@ public class ParametizedReportFormController {
 			evaluationContext.setEvaluationDate(endDate);
 			evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), startDate);
 			evaluationContext.addParameterValue(ReportingConstants.END_DATE_PARAMETER.getName(), endDate);
+			evaluationContext.addParameterValue("minCd4", ped_tf_rpt4_cd4_perc);
+			evaluationContext.addParameterValue("monthsAfter", 10);
+
 			// get the cohort
 			CohortDefinitionService cohortDefinitionService = Context.getService(CohortDefinitionService.class);
 			Cohort cohort = cohortDefinitionService.evaluate(cohortDefinition, evaluationContext);

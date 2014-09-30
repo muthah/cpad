@@ -1,37 +1,5 @@
 package org.openmrs.module.amrsreports.reporting.provider;
 
-import org.apache.commons.io.IOUtils;
-import org.openmrs.Concept;
-import org.openmrs.Location;
-import org.openmrs.api.APIException;
-import org.openmrs.module.amrsreports.cache.MohCacheUtils;
-import org.openmrs.module.amrsreports.reporting.CommonICAPCohortLibrary;
-import org.openmrs.module.amrsreports.reporting.CommonIndicatorLibrary;
-import org.openmrs.module.amrsreports.reporting.CommonSQLCohortLibrary;
-import org.openmrs.module.amrsreports.reporting.ReportUtils;
-import org.openmrs.module.amrsreports.reporting.cohort.definition.CCCPatientCohortDefinition;
-import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
-import org.openmrs.module.reporting.ReportingConstants;
-import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
-import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition;
-import org.openmrs.module.reporting.evaluation.parameter.Mapped;
-import org.openmrs.module.reporting.evaluation.parameter.Parameter;
-import org.openmrs.module.reporting.indicator.CohortIndicator;
-import org.openmrs.module.reporting.indicator.dimension.CohortDefinitionDimension;
-import org.openmrs.module.reporting.report.ReportDesign;
-import org.openmrs.module.reporting.report.ReportDesignResource;
-import org.openmrs.module.reporting.report.definition.PeriodIndicatorReportDefinition;
-import org.openmrs.module.reporting.report.definition.ReportDefinition;
-import org.openmrs.module.reporting.report.renderer.ExcelTemplateRenderer;
-import org.openmrs.util.OpenmrsClassLoader;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Provides mechanisms for rendering the MOH 361A Pre-ART Register
  */

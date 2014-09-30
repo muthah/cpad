@@ -14,41 +14,10 @@
 
 package org.openmrs.module.amrsreports.reporting;
 
-import org.openmrs.Concept;
-import org.openmrs.EncounterType;
-import org.openmrs.Location;
-import org.openmrs.Program;
-import org.openmrs.api.PatientSetService;
-import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.cache.MetadataUtils;
-import org.openmrs.module.amrsreports.cache.MohCacheUtils;
-import org.openmrs.module.amrsreports.calculation.library.hiv.art.EligibleForArtCalculation;
-import org.openmrs.module.amrsreports.calculation.library.hiv.art.InitialArtStartDateCalculation;
-import org.openmrs.module.amrsreports.calculation.library.hiv.art.OnAlternateFirstLineArtCalculation;
-import org.openmrs.module.amrsreports.calculation.library.hiv.art.OnArtCalculation;
-import org.openmrs.module.amrsreports.calculation.library.hiv.art.OnOriginalFirstLineArtCalculation;
-import org.openmrs.module.amrsreports.calculation.library.hiv.art.OnSecondLineArtCalculation;
-import org.openmrs.module.amrsreports.calculation.library.hiv.art.PregnantAtArtStartCalculation;
-import org.openmrs.module.amrsreports.calculation.library.hiv.art.TbPatientAtArtStartCalculation;
-import org.openmrs.module.amrsreports.calculation.library.hiv.art.WhoStageAtArtStartCalculation;
-import org.openmrs.module.amrsreports.reporting.calculation.CalculationCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.indicatorsSQLLib.BaseSQLCohortLibrary;
 import org.openmrs.module.amrsreports.reporting.indicatorsSQLLib.artRegimens.RegimensSQLCohortLibrary;
-import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
-import org.openmrs.module.amrsreports.subcohorts.DateCalculationCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.AgeCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.GenderCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
-import org.openmrs.module.reporting.common.SetComparator;
-import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 
 /**
  * Library of Regimens

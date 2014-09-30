@@ -8,8 +8,6 @@ import org.openmrs.module.amrsreports.reporting.ReportUtils;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ICAPCCCNoDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.ICAPCD4CountDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.ICAPMaritalStatusDataDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.common.SortCriteria;

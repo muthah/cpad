@@ -36,7 +36,7 @@ import java.util.Date;
 public class MOH731CohortLibrary {
 
 
-	private CommonCohortLibrary commonCohortLibrary = new CommonCohortLibrary();
+	private ICAPCommonCohortLibrary commonCohortLibrary = new ICAPCommonCohortLibrary();
 
 
     /**

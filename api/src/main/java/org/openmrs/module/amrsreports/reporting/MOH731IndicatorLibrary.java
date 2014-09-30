@@ -14,20 +14,12 @@
 
 package org.openmrs.module.amrsreports.reporting;
 
-import org.openmrs.Concept;
 import org.openmrs.Location;
-import org.openmrs.module.amrsreports.cache.MetadataUtils;
-import org.openmrs.module.amrsreports.cache.MohCacheUtils;
-import org.openmrs.module.amrsreports.reporting.cohort.definition.DeadPatientsCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.indicatorsSQLLib.BaseSQLCohortLibrary;
 import org.openmrs.module.amrsreports.reporting.indicatorsSQLLib.MOH731.MOH731SQLCohortLibrary;
-import org.openmrs.module.amrsreports.reporting.indicatorsSQLLib.artCareFollowup.ArtCareSQLCohortLibrary;
-import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
-import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -65,27 +57,27 @@ public class MOH731IndicatorLibrary {
      */
 
 	public CohortIndicator infantsEnrolledInCare() {
-		return CommonIndicatorLibrary.createCohortIndicator("Infants Enrolled in care",
+		return ICAPCommonIndicatorLibrary.createCohortIndicator("Infants Enrolled in care",
 				ReportUtils.map(baseCohorts.compositionAgeInMonthsCohort(0,11,sqlQueries.infantsEnrolledInCareBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
 	}
 
     public CohortIndicator malesBelow15EnrolledInCare() {
-        return CommonIndicatorLibrary.createCohortIndicator("Males < 15 Enrolled in care",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Males < 15 Enrolled in care",
                 ReportUtils.map(baseCohorts.compositionMaxAgeCohort(14,sqlQueries.malePatientsEnrolledInCareBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator males15AndAboveEnrolledInCare() {
-        return CommonIndicatorLibrary.createCohortIndicator("Males >=15 Enrolled in care",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Males >=15 Enrolled in care",
                 ReportUtils.map(baseCohorts.compositionMinAgeCohort(15,sqlQueries.malePatientsEnrolledInCareBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator femalesBelow15EnrolledInCare() {
-        return CommonIndicatorLibrary.createCohortIndicator("Females < 15 Enrolled in care",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Females < 15 Enrolled in care",
                 ReportUtils.map(baseCohorts.compositionMaxAgeCohort(14,sqlQueries.femalePatientsEnrolledInCareBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator females15AndAboveEnrolledInCare() {
-        return CommonIndicatorLibrary.createCohortIndicator("Females >=15 Enrolled in care",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Females >=15 Enrolled in care",
                 ReportUtils.map(baseCohorts.compositionMinAgeCohort(15,sqlQueries.femalePatientsEnrolledInCareBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
@@ -96,27 +88,27 @@ public class MOH731IndicatorLibrary {
      */
 
     public CohortIndicator infantsCurrentlyEnrolledInCare() {
-        return CommonIndicatorLibrary.createCohortIndicator("Infants Currently Enrolled in care",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Infants Currently Enrolled in care",
                 ReportUtils.map(baseCohorts.compositionAgeInMonthsCohort(0,11,sqlQueries.infantsCurrentlyInCareBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator malesBelow15CurrentlyEnrolledInCare() {
-        return CommonIndicatorLibrary.createCohortIndicator("Males < 15 Currently Enrolled in care",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Males < 15 Currently Enrolled in care",
                 ReportUtils.map(baseCohorts.compositionMaxAgeCohort(14,sqlQueries.malePatientsCurrentlyInCareBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator males15AndAboveCurrentlyEnrolledInCare() {
-        return CommonIndicatorLibrary.createCohortIndicator("Males >=15 Currently Enrolled in care",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Males >=15 Currently Enrolled in care",
                 ReportUtils.map(baseCohorts.compositionMinAgeCohort(15,sqlQueries.malePatientsCurrentlyInCareBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator femalesBelow15CurrentlyEnrolledInCare() {
-        return CommonIndicatorLibrary.createCohortIndicator("Females < 15 Currently Enrolled in care",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Females < 15 Currently Enrolled in care",
                 ReportUtils.map(baseCohorts.compositionMaxAgeCohort(14,sqlQueries.femalePatientsCurrentlyInCareBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator females15AndAboveCurrentlyEnrolledInCare() {
-        return CommonIndicatorLibrary.createCohortIndicator("Females >=15 Currently Enrolled in care",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Females >=15 Currently Enrolled in care",
                 ReportUtils.map(baseCohorts.compositionMinAgeCohort(15,sqlQueries.femalePatientsCurrentlyInCareBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
@@ -127,33 +119,33 @@ public class MOH731IndicatorLibrary {
      */
 
     public CohortIndicator infantsExposedWithin2Months() {
-        return CommonIndicatorLibrary.createCohortIndicator("Infants Exposed within 2 months",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Infants Exposed within 2 months",
                 ReportUtils.map(baseCohorts.compositionAgeInMonthsCohort(0,11,sqlQueries.exposedInfantsBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator infantsExposedAt2Months() {
-        return CommonIndicatorLibrary.createCohortIndicator("Infants Exposed at 2 months",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Infants Exposed at 2 months",
                 ReportUtils.map(baseCohorts.compositionAgeInMonthsCohort(0,11,sqlQueries.exposedInfantsBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
 
     public CohortIndicator malesBelow15OnCotrimoxazole() {
-        return CommonIndicatorLibrary.createCohortIndicator("Males < 15 On Cotrimoxazole",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Males < 15 On Cotrimoxazole",
                 ReportUtils.map(baseCohorts.compositionMaxAgeCohort(14,sqlQueries.malePatientsOnCotrimoxazoleBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator males15AndAboveOnCotrimoxazole() {
-        return CommonIndicatorLibrary.createCohortIndicator("Males >=15 On Cotrimoxazole",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Males >=15 On Cotrimoxazole",
                 ReportUtils.map(baseCohorts.compositionMinAgeCohort(15,sqlQueries.malePatientsOnCotrimoxazoleBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator femalesBelow15OnCotrimoxazole() {
-        return CommonIndicatorLibrary.createCohortIndicator("Females < 15 On Cotrimoxazole",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Females < 15 On Cotrimoxazole",
                 ReportUtils.map(baseCohorts.compositionMaxAgeCohort(14,sqlQueries.femalePatientsOnCotrimoxazoleBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator females15AndAboveOnCotrimoxazole() {
-        return CommonIndicatorLibrary.createCohortIndicator("Females >=15 On Cotrimoxazole",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Females >=15 On Cotrimoxazole",
                 ReportUtils.map(baseCohorts.compositionMinAgeCohort(15,sqlQueries.femalePatientsOnCotrimoxazoleBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
@@ -162,26 +154,26 @@ public class MOH731IndicatorLibrary {
      * @return
      */
     public CohortIndicator infantsCurrentlyOnART() {
-        return CommonIndicatorLibrary.createCohortIndicator("Infants currently on ART",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Infants currently on ART",
                 ReportUtils.map(baseCohorts.compositionMaxAgeCohort(14,sqlQueries.infantsCurrentlyOnARTBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
     public CohortIndicator malesBelow15CurrentlyOnART() {
-        return CommonIndicatorLibrary.createCohortIndicator("Males < 15 currently on ART",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Males < 15 currently on ART",
                 ReportUtils.map(baseCohorts.compositionMaxAgeCohort(14,sqlQueries.malePatientsCurrentlyOnARTBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator males15AndAboveCurrentlyOnART() {
-        return CommonIndicatorLibrary.createCohortIndicator("Males >=15 currently on ART",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Males >=15 currently on ART",
                 ReportUtils.map(baseCohorts.compositionMinAgeCohort(15,sqlQueries.malePatientsCurrentlyOnARTBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator femalesBelow15CurrentlyOnART() {
-        return CommonIndicatorLibrary.createCohortIndicator("Females < 15 currently on ART",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Females < 15 currently on ART",
                 ReportUtils.map(baseCohorts.compositionMaxAgeCohort(14,sqlQueries.femalePatientsCurrentlyOnARTBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator females15AndAboveCurrentlyOnART() {
-        return CommonIndicatorLibrary.createCohortIndicator("Females >=15 currently on ART",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Females >=15 currently on ART",
                 ReportUtils.map(baseCohorts.compositionMinAgeCohort(15,sqlQueries.femalePatientsCurrentlyOnARTBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
@@ -190,22 +182,22 @@ public class MOH731IndicatorLibrary {
      * @return
      */
     public CohortIndicator malesBelow15EverOnCare() {
-        return CommonIndicatorLibrary.createCohortIndicator("Males < 15 Ever on Care",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Males < 15 Ever on Care",
                 ReportUtils.map(baseCohorts.compositionMaxAgeCohort(14,sqlQueries.malePatientsEverOnCareQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator males15AndAboveEverOnCare() {
-        return CommonIndicatorLibrary.createCohortIndicator("Males >=15 Ever on Care",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Males >=15 Ever on Care",
                 ReportUtils.map(baseCohorts.compositionMinAgeCohort(15,sqlQueries.malePatientsEverOnCareQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator femalesBelow15EverOnCare() {
-        return CommonIndicatorLibrary.createCohortIndicator("Females < 15 Ever on Care",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Females < 15 Ever on Care",
                 ReportUtils.map(baseCohorts.compositionMaxAgeCohort(14,sqlQueries.femalePatientsEverOnCareQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator females15AndAboveEverOnCare() {
-        return CommonIndicatorLibrary.createCohortIndicator("Females >=15 Ever on Care",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Females >=15 Ever on Care",
                 ReportUtils.map(baseCohorts.compositionMinAgeCohort(15,sqlQueries.femalePatientsEverOnCareQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
@@ -214,26 +206,26 @@ public class MOH731IndicatorLibrary {
      * @return
      */
     public CohortIndicator infantsWithARTRevisits() {
-        return CommonIndicatorLibrary.createCohortIndicator("Infants With Revisits",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Infants With Revisits",
                 ReportUtils.map(baseCohorts.compositionAgeInMonthsCohort(0,11,sqlQueries.infantsWithRevisitsBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
     public CohortIndicator malesBelow15WithARTRevisits() {
-        return CommonIndicatorLibrary.createCohortIndicator("Males < 15 With Revisits",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Males < 15 With Revisits",
                 ReportUtils.map(baseCohorts.compositionMaxAgeCohort(14,sqlQueries.malePatientsWithRevisitsBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator males15AndAboveWithARTRevisits() {
-        return CommonIndicatorLibrary.createCohortIndicator("Males >=15 With Revisits",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Males >=15 With Revisits",
                 ReportUtils.map(baseCohorts.compositionMinAgeCohort(15,sqlQueries.malePatientsWithRevisitsBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator femalesBelow15WithARTRevisits() {
-        return CommonIndicatorLibrary.createCohortIndicator("Females < 15 With Revisits",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Females < 15 With Revisits",
                 ReportUtils.map(baseCohorts.compositionMaxAgeCohort(14,sqlQueries.femalePatientsWithRevisitsBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator females15AndAboveWithARTRevisits() {
-        return CommonIndicatorLibrary.createCohortIndicator("Females >=15 With Revisits",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Females >=15 With Revisits",
                 ReportUtils.map(baseCohorts.compositionMinAgeCohort(15,sqlQueries.femalePatientsWithRevisitsBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
@@ -242,26 +234,26 @@ public class MOH731IndicatorLibrary {
      * @return
      */
     public CohortIndicator infantsStartingART() {
-        return CommonIndicatorLibrary.createCohortIndicator("Infants Starting ART",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Infants Starting ART",
                 ReportUtils.map(baseCohorts.compositionAgeInMonthsCohort(0,11,sqlQueries.infantsStartingARTBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
     public CohortIndicator malesBelow15StartingART() {
-        return CommonIndicatorLibrary.createCohortIndicator("Males < 15 Starting ART",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Males < 15 Starting ART",
                 ReportUtils.map(baseCohorts.compositionMaxAgeCohort(14,sqlQueries.malePatientsStartingARTBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator males15AndAboveStartingART() {
-        return CommonIndicatorLibrary.createCohortIndicator("Males >=15 Starting ART",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Males >=15 Starting ART",
                 ReportUtils.map(baseCohorts.compositionMinAgeCohort(15,sqlQueries.malePatientsStartingARTBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator femalesBelow15StartingART() {
-        return CommonIndicatorLibrary.createCohortIndicator("Females < 15 Starting ART",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Females < 15 Starting ART",
                 ReportUtils.map(baseCohorts.compositionMaxAgeCohort(14,sqlQueries.femalePatientsStartingARTBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator females15AndAboveStartingART() {
-        return CommonIndicatorLibrary.createCohortIndicator("Females >=15 Starting ART",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Females >=15 Starting ART",
                 ReportUtils.map(baseCohorts.compositionMinAgeCohort(15,sqlQueries.femalePatientsStartingARTBetweenDatesQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
@@ -270,17 +262,17 @@ public class MOH731IndicatorLibrary {
      */
 
     public CohortIndicator patientsOnOriginalFirstLine() {
-        return CommonIndicatorLibrary.createCohortIndicator("Patients on Original First Line",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Patients on Original First Line",
                 ReportUtils.map(baseCohorts.createCohortDefinition("patients on Original First Line",sqlQueries.patientsOnOriginalFirstLineRegimenQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator patientsOnAlternativeFirstLine() {
-        return CommonIndicatorLibrary.createCohortIndicator("Patients on alternative First Line",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Patients on alternative First Line",
                 ReportUtils.map(baseCohorts.createCohortDefinition("Patients on alternative First Line",sqlQueries.patientsOnAlternativeFirstLineRegimenQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator patientsOnSecondLineAndHigherRegimen() {
-        return CommonIndicatorLibrary.createCohortIndicator("Patients on Second Line or Higher Regimen",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Patients on Second Line or Higher Regimen",
                 ReportUtils.map(baseCohorts.createCohortDefinition("Patients on Second Line and Higher",sqlQueries.patientsOnSecondLineOrHigherRegimenQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
@@ -288,22 +280,22 @@ public class MOH731IndicatorLibrary {
      * TB Screening
      */
     public CohortIndicator malesBelow15ScreenedForTB() {
-        return CommonIndicatorLibrary.createCohortIndicator("Males < 15 Screened for TB",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Males < 15 Screened for TB",
                 ReportUtils.map(baseCohorts.compositionMaxAgeCohort(14,sqlQueries.malePatientsWhoHadTBScreeningQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator males15AndAboveScreenedForTB() {
-        return CommonIndicatorLibrary.createCohortIndicator("Males >=15 Screened for TB",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Males >=15 Screened for TB",
                 ReportUtils.map(baseCohorts.compositionMinAgeCohort(15,sqlQueries.malePatientsWhoHadTBScreeningQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator femalesBelow15ScreenedForTB() {
-        return CommonIndicatorLibrary.createCohortIndicator("Females < 15 Screened for TB",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Females < 15 Screened for TB",
                 ReportUtils.map(baseCohorts.compositionMaxAgeCohort(14,sqlQueries.femalePatientsWhoHadTBScreeningQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 
     public CohortIndicator females15AndAboveScreenedForTB() {
-        return CommonIndicatorLibrary.createCohortIndicator("Females >=15 Screened for TB",
+        return ICAPCommonIndicatorLibrary.createCohortIndicator("Females >=15 Screened for TB",
                 ReportUtils.map(baseCohorts.compositionMinAgeCohort(15,sqlQueries.femalePatientsWhoHadTBScreeningQry()), "startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
     }
 

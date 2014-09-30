@@ -1,7 +1,6 @@
 package org.openmrs.module.amrsreports.reporting.patientManagementReports;
 
 import org.apache.commons.io.IOUtils;
-import org.openmrs.Location;
 import org.openmrs.api.APIException;
 import org.openmrs.api.PatientSetService;
 import org.openmrs.api.context.Context;
@@ -10,13 +9,9 @@ import org.openmrs.module.amrsreports.reporting.ReportUtils;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
 import org.openmrs.module.amrsreports.reporting.data.ICAPCCCNoDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.ICAPCD4CountDataDefinition;
-import org.openmrs.module.amrsreports.reporting.data.ICAPMaritalStatusDataDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.NumericObsCohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.SqlCohortDefinition;
-import org.openmrs.module.reporting.common.RangeComparator;
 import org.openmrs.module.reporting.common.SortCriteria;
 import org.openmrs.module.reporting.data.converter.ObjectFormatter;
 import org.openmrs.module.reporting.data.person.definition.GenderDataDefinition;

@@ -21,6 +21,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Evaluator for treatmentFailureCohortDefinition
@@ -54,7 +55,7 @@ public class TreatmentFailureCohortDefinitionEvaluator implements CohortDefiniti
 		for( Integer ptId:startDates.keySet()){
 			Date startDate = (Date) startDates.get(ptId);
 			Date endDate = calEffectiveDate(startDate, monthsAfterInitiation);
-			List<CD4Details> ptData =(List<CD4Details>) cd4Data.get(ptId);
+			Set<CD4Details> ptData =(Set<CD4Details>) cd4Data.get(ptId);
 			boolean isEligible = eligible(startDate, endDate, minCD4, ptData );
 			if (isEligible)
 				cohort.addMember(ptId);
@@ -71,7 +72,7 @@ public class TreatmentFailureCohortDefinitionEvaluator implements CohortDefiniti
 		return cal.getTime();
 	}
 
-	private boolean eligible(Date lowerLimit, Date upperLimit, Double minCd4Count, List<CD4Details> patientCD4){
+	private boolean eligible(Date lowerLimit, Date upperLimit, Double minCd4Count, Set<CD4Details> patientCD4){
 
 		Calendar lowerLimitCal = Calendar.getInstance();
 		lowerLimitCal.setTime(lowerLimit);

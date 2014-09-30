@@ -19,14 +19,8 @@ import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.Program;
 import org.openmrs.api.PatientSetService;
-import org.openmrs.calculation.patient.PatientCalculation;
 import org.openmrs.module.amrsreports.cache.MohCacheUtils;
-import org.openmrs.module.amrsreports.calculation.library.InProgramCalculation;
-import org.openmrs.module.amrsreports.calculation.library.OnMedicationCalculation;
-import org.openmrs.module.amrsreports.calculation.library.hiv.art.OnAlternateFirstLineArtCalculation;
-import org.openmrs.module.amrsreports.reporting.calculation.CalculationCohortDefinition;
 import org.openmrs.module.amrsreports.rule.MohEvaluableNameConstants;
-import org.openmrs.module.amrsreports.subcohorts.DateObsValueBetweenCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.AgeCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CodedObsCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -43,7 +37,6 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 
 
 /**
@@ -538,20 +531,6 @@ public class CommonICAPCohortLibrary {
         return cd;
     }
 
-	/**
-	 * Patients who transferred in between ${onOrAfter} and ${onOrBefore}
-	 * @return the cohort definition
-	 */
-	public CohortDefinition transferredIn() {
-		Concept transferInDate = MohCacheUtils.getConcept(MohEvaluableNameConstants.ADMITTED_TO_HOSPITAL);//Dictionary.getConcept(Dictionary.TRANSFER_IN_DATE);
-
-		DateObsValueBetweenCohortDefinition cd = new DateObsValueBetweenCohortDefinition();
-		cd.setName("transferred in between dates");
-		cd.setQuestion(transferInDate);
-		cd.addParameter(new Parameter("onOrAfter", "After Date", Date.class));
-		cd.addParameter(new Parameter("onOrBefore", "Before Date", Date.class));
-		return cd;
-	}
 
 	/**
 	 * Patients who transferred in between ${onOrAfter} and ${onOrBefore}
@@ -587,56 +566,6 @@ public class CommonICAPCohortLibrary {
 		return cd;
 	}
 
-	/**
-	 * Patients who were enrolled on the given programs (excluding transfers) between ${fromDate} and ${toDate}
-	 * @param programs the programs
-	 * @return the cohort definition
-	 */
-	public CohortDefinition enrolledExcludingTransfers(Program... programs) {
-		CompositionCohortDefinition cd = new CompositionCohortDefinition();
-		cd.setName("enrolled excluding transfers in program between dates");
-		cd.addParameter(new Parameter("onOrAfter", "From Date", Date.class));
-		cd.addParameter(new Parameter("onOrBefore", "To Date", Date.class));
-		cd.addSearch("enrolled", ReportUtils.map(enrolled(programs), "enrolledOnOrAfter=${onOrAfter},enrolledOnOrBefore=${onOrBefore}"));
-		cd.addSearch("transferIn", ReportUtils.map(transferredIn(), "onOrBefore=${onOrBefore}"));
-		cd.setCompositionString("enrolled AND NOT transferIn");
-		return cd;
-	}
 
-	/**
-	 * Patients who are pregnant on ${onDate}
-	 * @return the cohort definition
-	 */
-	public CohortDefinition pregnant() {
-		CalculationCohortDefinition cd = new CalculationCohortDefinition( new OnAlternateFirstLineArtCalculation());
-		cd.setName("pregnant on date");
-		cd.addParameter(new Parameter("onDate", "On Date", Date.class));
-		return cd;
-	}
 
-	/**
-	 * Patients who are in the specified program on ${onDate}
-	 * @param program the program
-	 * @return
-	 */
-	public CohortDefinition inProgram(Program program) {
-		CalculationCohortDefinition cd = new CalculationCohortDefinition( new InProgramCalculation());
-		cd.setName("in " + program.getName() + " on date");
-		cd.addParameter(new Parameter("onDate", "On Date", Date.class));
-		cd.addCalculationParameter("program", program);
-		return cd;
-	}
-
-	/**
-	 * Patients who are on the specified medication on ${onDate}
-	 * @param concepts the drug concepts
-	 * @return the cohort definition
-	 */
-	public CohortDefinition onMedication(Concept... concepts) {
-		CalculationCohortDefinition cd = new CalculationCohortDefinition( new OnMedicationCalculation());
-		cd.setName("taking drug on date");
-		cd.addParameter(new Parameter("onDate", "On Date", Date.class));
-		cd.addCalculationParameter("drugs", new HashSet<Concept>(Arrays.asList(concepts)));
-		return cd;
-	}
 }

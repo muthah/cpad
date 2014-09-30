@@ -3,21 +3,17 @@ package org.openmrs.module.amrsreports.reporting.provider;
 import org.apache.commons.io.IOUtils;
 import org.openmrs.Location;
 import org.openmrs.api.APIException;
-import org.openmrs.module.amrsreports.reporting.CommonCohortLibrary;
-import org.openmrs.module.amrsreports.reporting.CommonICAPCohortLibrary;
-import org.openmrs.module.amrsreports.reporting.CommonIndicatorLibrary;
+import org.openmrs.module.amrsreports.reporting.ICAPCommonIndicatorLibrary;
 import org.openmrs.module.amrsreports.reporting.ReportUtils;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.CCCPatientCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.indicatorsSQLLib.ArtCare.ArtCare20SQLCohortLibrary;
 import org.openmrs.module.amrsreports.reporting.indicatorsSQLLib.BaseSQLCohortLibrary;
-import org.openmrs.module.amrsreports.reporting.indicatorsSQLLib.palliativeCare.PalliativeCareSQLCohortLibrary;
 import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition;
 import org.openmrs.module.reporting.evaluation.parameter.Mapped;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.openmrs.module.reporting.indicator.CohortIndicator;
-import org.openmrs.module.reporting.indicator.dimension.CohortDefinitionDimension;
 import org.openmrs.module.reporting.report.ReportDesign;
 import org.openmrs.module.reporting.report.ReportDesignResource;
 import org.openmrs.module.reporting.report.definition.PeriodIndicatorReportDefinition;
@@ -27,7 +23,6 @@ import org.openmrs.util.OpenmrsClassLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -95,57 +90,57 @@ public class ARTCareProvider extends ReportProvider {
 
 
 
-        CohortIndicator malesZeroTo14ind = CommonIndicatorLibrary.createCohortIndicator("malesZeroTo14CohortIndicator",ReportUtils.map(malesZeroTo14Cohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator malesZeroTo14ind = ICAPCommonIndicatorLibrary.createCohortIndicator("malesZeroTo14CohortIndicator",ReportUtils.map(malesZeroTo14Cohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
 
-        CohortIndicator malesAbove15ind = CommonIndicatorLibrary.createCohortIndicator("malesAbove15CohortIndicator", ReportUtils.map(malesAbove15Cohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator malesAbove15ind = ICAPCommonIndicatorLibrary.createCohortIndicator("malesAbove15CohortIndicator", ReportUtils.map(malesAbove15Cohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
 
-        CohortIndicator femalesZeroTo14ind = CommonIndicatorLibrary.createCohortIndicator("femalesZeroTo14CohortIndicator", ReportUtils.map(femalesZeroTo14Cohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator femalesZeroTo14ind = ICAPCommonIndicatorLibrary.createCohortIndicator("femalesZeroTo14CohortIndicator", ReportUtils.map(femalesZeroTo14Cohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
 
-        CohortIndicator femalesAbove15ind = CommonIndicatorLibrary.createCohortIndicator("femalesAbove15CohortIndicator", ReportUtils.map(femalesAbove15Cohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator femalesAbove15ind = ICAPCommonIndicatorLibrary.createCohortIndicator("femalesAbove15CohortIndicator", ReportUtils.map(femalesAbove15Cohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
 
         /**
          * Add indicators for peds
          */
-        CohortIndicator pedsMalesZeroTo1ind = CommonIndicatorLibrary.createCohortIndicator("pedsMalesZeroTo1CohortIndicator", ReportUtils.map(pedsMalesZeroTo1Cohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator pedsFemalesZeroTo1ind = CommonIndicatorLibrary.createCohortIndicator("pedsFemalesZeroTo1CohortIndicator", ReportUtils.map(pedsFemalesZeroTo1Cohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator pedsmales2To4ind = CommonIndicatorLibrary.createCohortIndicator("pedsmales2To4CohortIndicator", ReportUtils.map(pedsmales2To4Cohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator pedsFemales2To4ind = CommonIndicatorLibrary.createCohortIndicator("pedsFemales2To4CohortIndicator", ReportUtils.map(pedsFemales2To4Cohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator pedsmales5To14ind = CommonIndicatorLibrary.createCohortIndicator("pedsmales5To14CohortIndicator", ReportUtils.map(pedsmales5To14Cohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator pedsFemales5To14ind = CommonIndicatorLibrary.createCohortIndicator("pedsFemales5To14CohortIndicator", ReportUtils.map(pedsFemales5To14Cohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator pedsMalesZeroTo1ind = ICAPCommonIndicatorLibrary.createCohortIndicator("pedsMalesZeroTo1CohortIndicator", ReportUtils.map(pedsMalesZeroTo1Cohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator pedsFemalesZeroTo1ind = ICAPCommonIndicatorLibrary.createCohortIndicator("pedsFemalesZeroTo1CohortIndicator", ReportUtils.map(pedsFemalesZeroTo1Cohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator pedsmales2To4ind = ICAPCommonIndicatorLibrary.createCohortIndicator("pedsmales2To4CohortIndicator", ReportUtils.map(pedsmales2To4Cohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator pedsFemales2To4ind = ICAPCommonIndicatorLibrary.createCohortIndicator("pedsFemales2To4CohortIndicator", ReportUtils.map(pedsFemales2To4Cohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator pedsmales5To14ind = ICAPCommonIndicatorLibrary.createCohortIndicator("pedsmales5To14CohortIndicator", ReportUtils.map(pedsmales5To14Cohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator pedsFemales5To14ind = ICAPCommonIndicatorLibrary.createCohortIndicator("pedsFemales5To14CohortIndicator", ReportUtils.map(pedsFemales5To14Cohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
 
         /**
          * Define indicators for end date
          */
 
-        CohortIndicator malesZeroTo14indend = CommonIndicatorLibrary.createCohortIndicator("malesZeroTo14CohortIndicatorEnd", ReportUtils.map(malesZeroTo14EndCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator malesZeroTo14indend = ICAPCommonIndicatorLibrary.createCohortIndicator("malesZeroTo14CohortIndicatorEnd", ReportUtils.map(malesZeroTo14EndCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
 
-        CohortIndicator malesAbove15indend = CommonIndicatorLibrary.createCohortIndicator("malesAbove15CohortIndicatorEnd", ReportUtils.map(malesAbove15EndCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator malesAbove15indend = ICAPCommonIndicatorLibrary.createCohortIndicator("malesAbove15CohortIndicatorEnd", ReportUtils.map(malesAbove15EndCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
 
-        CohortIndicator femalesZeroTo14indend = CommonIndicatorLibrary.createCohortIndicator("femalesZeroTo14CohortIndicatorEnd", ReportUtils.map(femalesZeroTo14EndCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator femalesZeroTo14indend = ICAPCommonIndicatorLibrary.createCohortIndicator("femalesZeroTo14CohortIndicatorEnd", ReportUtils.map(femalesZeroTo14EndCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
 
-        CohortIndicator femalesAbove15indend = CommonIndicatorLibrary.createCohortIndicator("femalesAbove15CohortIndicatorEnd", ReportUtils.map(femalesAbove15EndCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator femalesAbove15indend = ICAPCommonIndicatorLibrary.createCohortIndicator("femalesAbove15CohortIndicatorEnd", ReportUtils.map(femalesAbove15EndCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
 
         /**
          * Add indicators for peds
          */
-        CohortIndicator pedsMalesZeroTo1indend = CommonIndicatorLibrary.createCohortIndicator("pedsMalesZeroTo1CohortIndicatorEnd", ReportUtils.map(pedsMalesZeroTo1EndCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator pedsFemalesZeroTo1indend = CommonIndicatorLibrary.createCohortIndicator("pedsFemalesZeroTo1CohortIndicatorEnd", ReportUtils.map(pedsFemalesZeroTo1EndCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator pedsmales2To4indend = CommonIndicatorLibrary.createCohortIndicator("pedsmales2To4CohortIndicatorEnd", ReportUtils.map(pedsmales2To4EndCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator pedsFemales2To4indend = CommonIndicatorLibrary.createCohortIndicator("pedsFemales2To4CohortIndicatorEnd", ReportUtils.map(pedsFemales2To4EndCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator pedsmales5To14indend = CommonIndicatorLibrary.createCohortIndicator("pedsmales5To14CohortIndicatorEnd", ReportUtils.map(pedsmales5To14EndCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator pedsFemales5To14indend = CommonIndicatorLibrary.createCohortIndicator("pedsFemales5To14CohortIndicatorEnd", ReportUtils.map(pedsFemales5To14EndCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator pedsMalesZeroTo1indend = ICAPCommonIndicatorLibrary.createCohortIndicator("pedsMalesZeroTo1CohortIndicatorEnd", ReportUtils.map(pedsMalesZeroTo1EndCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator pedsFemalesZeroTo1indend = ICAPCommonIndicatorLibrary.createCohortIndicator("pedsFemalesZeroTo1CohortIndicatorEnd", ReportUtils.map(pedsFemalesZeroTo1EndCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator pedsmales2To4indend = ICAPCommonIndicatorLibrary.createCohortIndicator("pedsmales2To4CohortIndicatorEnd", ReportUtils.map(pedsmales2To4EndCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator pedsFemales2To4indend = ICAPCommonIndicatorLibrary.createCohortIndicator("pedsFemales2To4CohortIndicatorEnd", ReportUtils.map(pedsFemales2To4EndCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator pedsmales5To14indend = ICAPCommonIndicatorLibrary.createCohortIndicator("pedsmales5To14CohortIndicatorEnd", ReportUtils.map(pedsmales5To14EndCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator pedsFemales5To14indend = ICAPCommonIndicatorLibrary.createCohortIndicator("pedsFemales5To14CohortIndicatorEnd", ReportUtils.map(pedsFemales5To14EndCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
 
 
-        CohortIndicator malesBelow15TransfersIndi = CommonIndicatorLibrary.createCohortIndicator("malesBelow15TransfersCohortIndicator",ReportUtils.map(malesAgedBelow15TransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator malesAbove15TransfersCohortIndi = CommonIndicatorLibrary.createCohortIndicator("malesAbove15TransfersCohortIndicator",ReportUtils.map(malesAbove15TransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator femalesBelow15TransfersCohortIndi = CommonIndicatorLibrary.createCohortIndicator("femalesBelow15TransfersCohortIndicator",ReportUtils.map(femalesBelow15TransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator femalesAbove15TransfersCohortIndi = CommonIndicatorLibrary.createCohortIndicator("femalesAbove15TransfersCohortIndicator",ReportUtils.map(femalesAbove15TransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator pedsMalesZeroTo1TransfersCohortIndi = CommonIndicatorLibrary.createCohortIndicator("malesZeroTo14TransfersCohortIndicator",ReportUtils.map(pedsMalesZeroTo1TransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator pedsFemalesZeroTo1TransfersCohortIndi = CommonIndicatorLibrary.createCohortIndicator("pedsMalesZeroTo1TransfersCohortIndicator",ReportUtils.map(pedsfemalesZeroTo1TransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator pedsmales2To4TransfersCohortIndi = CommonIndicatorLibrary.createCohortIndicator("pedsmales2To4TransfersCohortIndicator",ReportUtils.map(pedsmales2To4TransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator pedsFemales2To4TransfersCohortIndi = CommonIndicatorLibrary.createCohortIndicator("pedsFemales2To4TransfersCohortIndicator",ReportUtils.map(pedsfemales2To4TransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator pedsmales5To14TransfersCohortIndi = CommonIndicatorLibrary.createCohortIndicator("pedsmales5To14TransfersCohortIndicator",ReportUtils.map(pedsmales5To14TransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator pedsFemales5To14TransfersCohortIndi = CommonIndicatorLibrary.createCohortIndicator("pedsFemales5To14TransfersCohortIndicator",ReportUtils.map(pedsFemales5To14TransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator malesBelow15TransfersIndi = ICAPCommonIndicatorLibrary.createCohortIndicator("malesBelow15TransfersCohortIndicator",ReportUtils.map(malesAgedBelow15TransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator malesAbove15TransfersCohortIndi = ICAPCommonIndicatorLibrary.createCohortIndicator("malesAbove15TransfersCohortIndicator",ReportUtils.map(malesAbove15TransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator femalesBelow15TransfersCohortIndi = ICAPCommonIndicatorLibrary.createCohortIndicator("femalesBelow15TransfersCohortIndicator",ReportUtils.map(femalesBelow15TransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator femalesAbove15TransfersCohortIndi = ICAPCommonIndicatorLibrary.createCohortIndicator("femalesAbove15TransfersCohortIndicator",ReportUtils.map(femalesAbove15TransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator pedsMalesZeroTo1TransfersCohortIndi = ICAPCommonIndicatorLibrary.createCohortIndicator("malesZeroTo14TransfersCohortIndicator",ReportUtils.map(pedsMalesZeroTo1TransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator pedsFemalesZeroTo1TransfersCohortIndi = ICAPCommonIndicatorLibrary.createCohortIndicator("pedsMalesZeroTo1TransfersCohortIndicator",ReportUtils.map(pedsfemalesZeroTo1TransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator pedsmales2To4TransfersCohortIndi = ICAPCommonIndicatorLibrary.createCohortIndicator("pedsmales2To4TransfersCohortIndicator",ReportUtils.map(pedsmales2To4TransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator pedsFemales2To4TransfersCohortIndi = ICAPCommonIndicatorLibrary.createCohortIndicator("pedsFemales2To4TransfersCohortIndicator",ReportUtils.map(pedsfemales2To4TransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator pedsmales5To14TransfersCohortIndi = ICAPCommonIndicatorLibrary.createCohortIndicator("pedsmales5To14TransfersCohortIndicator",ReportUtils.map(pedsmales5To14TransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator pedsFemales5To14TransfersCohortIndi = ICAPCommonIndicatorLibrary.createCohortIndicator("pedsFemales5To14TransfersCohortIndicator",ReportUtils.map(pedsFemales5To14TransfersCohort,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
 
 
 

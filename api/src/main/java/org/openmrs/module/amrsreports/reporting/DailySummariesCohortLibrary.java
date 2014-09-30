@@ -16,10 +16,8 @@ package org.openmrs.module.amrsreports.reporting;
 
 import org.openmrs.Location;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.*;
-import org.openmrs.module.reporting.cohort.definition.AgeCohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.CompositionCohortDefinition;
-import org.openmrs.module.reporting.common.DurationUnit;
 import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +30,7 @@ import java.util.Date;
 public class DailySummariesCohortLibrary {
 
 
-	private CommonCohortLibrary commonCohortLibrary = new CommonCohortLibrary();
+	private ICAPCommonCohortLibrary commonCohortLibrary = new ICAPCommonCohortLibrary();
 
 
     /**

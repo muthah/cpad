@@ -4,24 +4,20 @@ import org.apache.commons.io.IOUtils;
 import org.openmrs.Location;
 import org.openmrs.api.APIException;
 import org.openmrs.module.amrsreports.reporting.CohortAnalysisIndicatorLibrary;
-import org.openmrs.module.amrsreports.reporting.CommonIndicatorLibrary;
+import org.openmrs.module.amrsreports.reporting.ICAPCommonIndicatorLibrary;
 import org.openmrs.module.amrsreports.reporting.ReportUtils;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.CCCPatientCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.CurrentlyOnARTCohortDefinition;
-import org.openmrs.module.amrsreports.reporting.cohort.definition.DeadPatients12CohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.DeadPatients24CohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.DeadPatients36CohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.DeadPatientsStartCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.EnrolledInCareCohortDefinition;
-import org.openmrs.module.amrsreports.reporting.cohort.definition.StoppedARTCare12CohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.StoppedARTCare24CohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.StoppedARTCare36CohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.StoppedARTCareStartCohortDefinition;
-import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferIN12CohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferIN24CohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferIN36CohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferINStartCohortDefinition;
-import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferOUT12CohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferOUT24CohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferOUT36CohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.TransferOUTStartCohortDefinition;
@@ -75,9 +71,9 @@ public class DifferentCohortAnalysisReportProvider extends ReportProvider {
         CohortDefinition alternativeFirstLineAtStart = baseSQLCohortLibrary.createCohortDefinition("Alternative First Line Cohort At Start",sqlQueries.patientsOnAlternativeFirstLineRegimen(12));
         CohortDefinition secondLineAtStart =baseSQLCohortLibrary.createCohortDefinition("Second Line Cohort At Start",sqlQueries.patientsOnSecondLineOrHigher(12));
 
-        CohortIndicator originalFirstLineAtStartInd = CommonIndicatorLibrary.createCohortIndicator("originalFirstLineAtStartInd", ReportUtils.map(originalFirstLineAtStart,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator alternativeFirstLineAtStartInd = CommonIndicatorLibrary.createCohortIndicator("alternativeFirstLineAtStartInd",ReportUtils.map(alternativeFirstLineAtStart,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator secondLineAtStartInd = CommonIndicatorLibrary.createCohortIndicator("secondLineAtStartInd", ReportUtils.map(secondLineAtStart,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator originalFirstLineAtStartInd = ICAPCommonIndicatorLibrary.createCohortIndicator("originalFirstLineAtStartInd", ReportUtils.map(originalFirstLineAtStart,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator alternativeFirstLineAtStartInd = ICAPCommonIndicatorLibrary.createCohortIndicator("alternativeFirstLineAtStartInd",ReportUtils.map(alternativeFirstLineAtStart,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator secondLineAtStartInd = ICAPCommonIndicatorLibrary.createCohortIndicator("secondLineAtStartInd", ReportUtils.map(secondLineAtStart,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
 
 
         /*Define cohorts 24 months from reporting period*/
@@ -85,9 +81,9 @@ public class DifferentCohortAnalysisReportProvider extends ReportProvider {
         CohortDefinition alternativeFirstLineAt12 = baseSQLCohortLibrary.createCohortDefinition("Alternative First Line Cohort At 12",sqlQueries.patientsOnAlternativeFirstLineRegimen(24));
         CohortDefinition secondLineAt12 =baseSQLCohortLibrary.createCohortDefinition("Second Line Cohort At 12",sqlQueries.patientsOnSecondLineOrHigher(24));
 
-        CohortIndicator originalFirstLineAt12Ind = CommonIndicatorLibrary.createCohortIndicator("originalFirstLineAt12Ind", ReportUtils.map(originalFirstLineAt12,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator alternativeFirstLineAt12Ind = CommonIndicatorLibrary.createCohortIndicator("alternativeFirstLineAt12Ind",ReportUtils.map(alternativeFirstLineAt12,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator secondLineAt12Ind = CommonIndicatorLibrary.createCohortIndicator("secondLineAt12Ind", ReportUtils.map(secondLineAt12,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator originalFirstLineAt12Ind = ICAPCommonIndicatorLibrary.createCohortIndicator("originalFirstLineAt12Ind", ReportUtils.map(originalFirstLineAt12,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator alternativeFirstLineAt12Ind = ICAPCommonIndicatorLibrary.createCohortIndicator("alternativeFirstLineAt12Ind",ReportUtils.map(alternativeFirstLineAt12,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator secondLineAt12Ind = ICAPCommonIndicatorLibrary.createCohortIndicator("secondLineAt12Ind", ReportUtils.map(secondLineAt12,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
 
 
          /*Define cohorts 36 months from reporting period*/
@@ -95,9 +91,9 @@ public class DifferentCohortAnalysisReportProvider extends ReportProvider {
         CohortDefinition alternativeFirstLineAt36 = baseSQLCohortLibrary.createCohortDefinition("Alternative First Line Cohort At 36",sqlQueries.patientsOnAlternativeFirstLineRegimen(36));
         CohortDefinition secondLineAt36 =baseSQLCohortLibrary.createCohortDefinition("Second Line Cohort At 36",sqlQueries.patientsOnSecondLineOrHigher(36));
 
-        CohortIndicator originalFirstLineAt36Ind = CommonIndicatorLibrary.createCohortIndicator("originalFirstLineAt36Ind", ReportUtils.map(originalFirstLineAt36,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator alternativeFirstLineAt36Ind = CommonIndicatorLibrary.createCohortIndicator("alternativeFirstLineAt36Ind",ReportUtils.map(alternativeFirstLineAt36,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
-        CohortIndicator secondLineAt36Ind = CommonIndicatorLibrary.createCohortIndicator("secondLineAt36Ind", ReportUtils.map(secondLineAt36,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator originalFirstLineAt36Ind = ICAPCommonIndicatorLibrary.createCohortIndicator("originalFirstLineAt36Ind", ReportUtils.map(originalFirstLineAt36,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator alternativeFirstLineAt36Ind = ICAPCommonIndicatorLibrary.createCohortIndicator("alternativeFirstLineAt36Ind",ReportUtils.map(alternativeFirstLineAt36,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
+        CohortIndicator secondLineAt36Ind = ICAPCommonIndicatorLibrary.createCohortIndicator("secondLineAt36Ind", ReportUtils.map(secondLineAt36,"startDate=${startDate},locationList=${locationList},endDate=${endDate}"));
 
 
         Map<String, Object> periodMappings = new HashMap<String, Object>();
