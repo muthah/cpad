@@ -1,16 +1,21 @@
 package org.openmrs.module.amrsreports.reporting.data.evaluator;
 
+import org.openmrs.Cohort;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.model.CD4Details;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.EnrolledInCareCohortDefinition;
+import org.openmrs.module.amrsreports.reporting.cohort.definition.TBCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.data.TreatmentCD4CountsDataDefinition;
 import org.openmrs.module.amrsreports.service.MohCoreService;
+import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.common.ListMap;
 import org.openmrs.module.reporting.data.person.EvaluatedPersonData;
 import org.openmrs.module.reporting.data.person.definition.PersonDataDefinition;
 import org.openmrs.module.reporting.data.person.evaluator.PersonDataEvaluator;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
+import org.openmrs.module.reporting.evaluation.parameter.Parameter;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -33,6 +38,18 @@ public class TreatmentCD4CountsDataEvaluator implements PersonDataEvaluator {
 
 		EvaluatedPersonData ret = new EvaluatedPersonData(definition, context);
 
+		//evaluate enrolled in care
+		EnrolledInCareCohortDefinition enrolled = new EnrolledInCareCohortDefinition();
+
+		//add params
+		enrolled.addParameter(new Parameter("startDate", "Report Date", Date.class));
+		enrolled.addParameter(new Parameter("endDate", "End Reporting Date", Date.class));
+
+		context.addParameterValue("startDate", context.getParameterValue("startDate"));
+		context.addParameterValue("endDate", context.getParameterValue("endDate"));
+		Cohort enrolledPatients = Context.getService(CohortDefinitionService.class).evaluate(enrolled, context);
+
+		//
 		Map<String, Object> m = new HashMap<String, Object>();
 		m.put("startDate", context.getParameterValue("startDate"));
 		m.put("endDate", context.getParameterValue("endDate"));
@@ -47,7 +64,7 @@ public class TreatmentCD4CountsDataEvaluator implements PersonDataEvaluator {
 
 		ListMap<Integer, CD4Details> cd4DetailsListMap = makeResultsMapFromSQL(sql, m);
 
-		for(Integer id: context.getBaseCohort().getMemberIds()){
+		for(Integer id: enrolledPatients.getMemberIds()){
 			ret.addData(id,safeFind(cd4DetailsListMap,id));
 		}
 

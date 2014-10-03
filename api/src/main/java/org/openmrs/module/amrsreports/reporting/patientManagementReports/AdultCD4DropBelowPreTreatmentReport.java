@@ -2,10 +2,8 @@ package org.openmrs.module.amrsreports.reporting.patientManagementReports;
 
 import org.apache.commons.io.IOUtils;
 import org.openmrs.api.APIException;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.amrsreports.reporting.PatientMgtCohortLibrary;
 import org.openmrs.module.amrsreports.reporting.ReportUtils;
-import org.openmrs.module.amrsreports.reporting.cohort.definition.StartedARTCareCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.cohort.definition.TreatmentFailureCohortDefinition;
 import org.openmrs.module.amrsreports.reporting.converter.DecimalAgeConverter;
 import org.openmrs.module.amrsreports.reporting.data.AgeAtEvaluationDateDataDefinition;
@@ -106,19 +104,13 @@ public class AdultCD4DropBelowPreTreatmentReport {
 
 		TreatmentFailureCohortDefinition tfdef = new TreatmentFailureCohortDefinition();
 		tfdef.setName("Treatment Failure Cohort Definition");
-		tfdef.addParameter(new Parameter("startDate", "After Date", Date.class));
-		tfdef.addParameter(new Parameter("endDate", "Before Date", Date.class));
-		tfdef.addParameter(new Parameter("minCd4", "Lower limit for CD4 Count", Double.class));
-		tfdef.addParameter(new Parameter("monthsAfter", "Duration after initiation of HAART", Integer.class));
 
 		CompositionCohortDefinition ccd = new CompositionCohortDefinition();
+		ccd.addParameter(new Parameter("startDate", "Start Date", Date.class));
 		ccd.addParameter(new Parameter("endDate", "Before Date", Date.class));
-		ccd.addParameter(new Parameter("startDate", "After Date", Date.class));
-		ccd.addParameter(new Parameter("minCd4", "Lower limit for CD4 Count", Double.class));
-		ccd.addParameter(new Parameter("monthsAfter", "Duration after initiation of HAART", Integer.class));
 		ccd.setName("Composition cohort for adults with x treatment persistence");
 		ccd.addSearch("adultsCohort", ReportUtils.map(cohortDefinition, "effectiveDate=${endDate}"));
-		ccd.addSearch("treatmentFailureCohort", ReportUtils.<CohortDefinition>map(tfdef, "onOrAfter=${startDate},onOrBefore=${endDate}, minCd4=${minCd4},monthsAfter=${monthsAfter}"));
+		ccd.addSearch("treatmentFailureCohort", ReportUtils.<CohortDefinition>map(tfdef, ""));
 		ccd.setCompositionString("adultsCohort AND treatmentFailureCohort");
 		return ccd;
 	}

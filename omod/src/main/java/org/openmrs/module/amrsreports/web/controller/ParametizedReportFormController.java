@@ -4,15 +4,22 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
-import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.amrsreports.MOHFacility;
 import org.openmrs.module.amrsreports.QueuedReport;
-import org.openmrs.module.amrsreports.reporting.patientManagementReports.*;
-import org.openmrs.module.amrsreports.reporting.provider.ReportProvider;
+import org.openmrs.module.amrsreports.reporting.patientManagementReports.AdultCD4DropBelowPreTreatmentReport;
+import org.openmrs.module.amrsreports.reporting.patientManagementReports.AdultCD4DropPercentageReport;
+import org.openmrs.module.amrsreports.reporting.patientManagementReports.AdultsNotOnARTCD4Report;
+import org.openmrs.module.amrsreports.reporting.patientManagementReports.AdultsTreatmentFailurePersistenceReport;
+import org.openmrs.module.amrsreports.reporting.patientManagementReports.ChildrenCD4MNotInHARRTReport;
+import org.openmrs.module.amrsreports.reporting.patientManagementReports.ChildrenCD4YNotInHAARTReport;
+import org.openmrs.module.amrsreports.reporting.patientManagementReports.ChildrenNotInHAARTReport;
+import org.openmrs.module.amrsreports.reporting.patientManagementReports.HIVandTBPatientsNOTOnARTReport;
+import org.openmrs.module.amrsreports.reporting.patientManagementReports.LatestCD4CountReport;
+import org.openmrs.module.amrsreports.reporting.patientManagementReports.PedTFReportFour;
+import org.openmrs.module.amrsreports.reporting.patientManagementReports.PedTFReportOne;
+import org.openmrs.module.amrsreports.reporting.patientManagementReports.PedTFReportThree;
+import org.openmrs.module.amrsreports.reporting.patientManagementReports.PedTFReportTwo;
 import org.openmrs.module.amrsreports.service.QueuedReportService;
-import org.openmrs.module.amrsreports.service.ReportProviderRegistrar;
-import org.openmrs.module.amrsreports.service.UserFacilityService;
 import org.openmrs.module.reporting.ReportingConstants;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
 import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
@@ -24,23 +31,23 @@ import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.openmrs.module.reporting.report.definition.service.ReportDefinitionService;
 import org.openmrs.module.reporting.report.renderer.ExcelTemplateRenderer;
 import org.openmrs.util.OpenmrsUtil;
-import org.openmrs.web.WebConstants;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 
 /**
@@ -53,7 +60,6 @@ public class ParametizedReportFormController {
 	private final Log log = LogFactory.getLog(getClass());
 
 	private static final String FORM_VIEW = "module/amrsreports/parametizedReportForm";
-	private static final String SUCCESS_VIEW = "redirect:queuedReport.list";
 
 	/**
 	 * adultsPersistence
@@ -64,7 +70,7 @@ public class ParametizedReportFormController {
 	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "adultsPersistence")
 	public void generateAdultsPersistence(HttpServletRequest request, HttpServletResponse response ) throws Exception {
 
-		Integer persistence = Integer.valueOf(request.getParameter("adultPersistencetimes"));
+		//Integer persistence = Integer.valueOf(request.getParameter("adultPersistencetimes"));
 		Double maxCd4 = Double.valueOf(request.getParameter("adt_maxcd4"));
 		Integer no_of_months = Integer.valueOf(request.getParameter("adt_noOfMonths"));
 		String effectiveDate = request.getParameter("evaluationDate");
@@ -77,9 +83,11 @@ public class ParametizedReportFormController {
 
 		try{
 			CohortDefinition cohortDefinition = queuedReport.getCohortDefinition();
-			cohortDefinition.addParameter(new Parameter("effectiveDate", "Effective Date", Date.class));
+			//cohortDefinition.addParameter(new Parameter("startDate", "Start Date", Date.class));
+			//cohortDefinition.addParameter(new Parameter("endDate", "Before Date", Date.class));
 
 			ReportDefinition reportDefinition = queuedReport.getReportDefinition();
+
 			EvaluationContext evaluationContext = new EvaluationContext();
 			evaluationContext.setEvaluationDate(endDate);
 			evaluationContext.addParameterValue(ReportingConstants.START_DATE_PARAMETER.getName(), startDate);
@@ -118,9 +126,9 @@ public class ParametizedReportFormController {
 			excelFileDownload.close();
 			xlsFile.delete();
 		}  catch (Exception e){
+			//e.getMessage();
 			e.printStackTrace();
-
-			throw new RuntimeException("There was a problem running this report!!!!");
+			throw new RuntimeException("There was a problem running this report!!!!" + e);
 		}
 	}
 
@@ -188,9 +196,8 @@ public class ParametizedReportFormController {
 			excelFileDownload.close();
 			xlsFile.delete();
 		}  catch (Exception e){
-			e.printStackTrace();
-
-			throw new RuntimeException("There was a problem running this report!!!!");
+			e.getMessage();
+			//e.printStackTrace();
 		}
 
 	}
@@ -257,9 +264,8 @@ public class ParametizedReportFormController {
 			excelFileDownload.close();
 			xlsFile.delete();
 		}  catch (Exception e){
-			e.printStackTrace();
-
-			throw new RuntimeException("There was a problem running this report!!!!");
+			e.getMessage();
+			//e.printStackTrace();
 		}
 
 	}
@@ -334,9 +340,8 @@ public class ParametizedReportFormController {
 			excelFileDownload.close();
 			xlsFile.delete();
 		}  catch (Exception e){
-			e.printStackTrace();
-
-			throw new RuntimeException("There was a problem running this report!!!!");
+			e.getMessage();
+			//e.printStackTrace();
 		}
 
 	}
@@ -405,9 +410,8 @@ public class ParametizedReportFormController {
 			excelFileDownload.close();
 			xlsFile.delete();
 		}  catch (Exception e){
+			e.getMessage();
 			e.printStackTrace();
-
-			throw new RuntimeException("There was a problem running this report!!!!");
 		}
 
 	}
@@ -475,9 +479,8 @@ public class ParametizedReportFormController {
 			excelFileDownload.close();
 			xlsFile.delete();
 		}  catch (Exception e){
+			e.getMessage();
 			e.printStackTrace();
-
-			throw new RuntimeException("There was a problem running this report!!!!");
 		}
 
 	}
@@ -547,9 +550,8 @@ public class ParametizedReportFormController {
 			excelFileDownload.close();
 			xlsFile.delete();
 		}  catch (Exception e){
+			e.getMessage();
 			e.printStackTrace();
-
-			throw new RuntimeException("There was a problem running this report!!!!");
 		}
 
 	}
@@ -611,9 +613,8 @@ public class ParametizedReportFormController {
             excelFileDownload.close();
             xlsFile.delete();
         }  catch (Exception e){
-            e.printStackTrace();
-
-            throw new RuntimeException("There was a problem running this report!!!!");
+			e.getMessage();
+			e.printStackTrace();
         }
 
 
@@ -686,9 +687,8 @@ public class ParametizedReportFormController {
             xlsFile.delete();
 
         }  catch (Exception e){
-            e.printStackTrace();
-
-            throw new RuntimeException("There was a problem running this report!!!!");
+			e.getMessage();
+			e.printStackTrace();
         }
 
 
@@ -754,9 +754,8 @@ public class ParametizedReportFormController {
             excelFileDownload.close();
             xlsFile.delete();
         }  catch (Exception e){
-            e.printStackTrace();
-
-            throw new RuntimeException("There was a problem running this report!!!!");
+			e.getMessage();
+			e.printStackTrace();
         }
 
     }
@@ -822,9 +821,8 @@ public class ParametizedReportFormController {
             excelFileDownload.close();
             xlsFile.delete();
         }  catch (Exception e){
-            e.printStackTrace();
-
-            throw new RuntimeException("There was a problem running this report!!!!");
+			e.getMessage();
+			e.printStackTrace();
         }
 
     }
@@ -890,9 +888,8 @@ public class ParametizedReportFormController {
             excelFileDownload.close();
             xlsFile.delete();
         }  catch (Exception e){
-            e.printStackTrace();
-
-            throw new RuntimeException("There was a problem running this report!!!!");
+			e.getMessage();
+			e.printStackTrace();
         }
 
     }
@@ -954,9 +951,8 @@ public class ParametizedReportFormController {
             excelFileDownload.close();
             xlsFile.delete();
         }  catch (Exception e){
-            e.printStackTrace();
-
-            throw new RuntimeException("There was a problem running this report!!!!");
+			e.getMessage();
+			e.printStackTrace();
         }
 
     }
@@ -1020,9 +1016,8 @@ public class ParametizedReportFormController {
             excelFileDownload.close();
             xlsFile.delete();
         }  catch (Exception e){
-            e.printStackTrace();
-
-            throw new RuntimeException("There was a problem running this report!!!!");
+			e.getMessage();
+			e.printStackTrace();
         }
 
     }
