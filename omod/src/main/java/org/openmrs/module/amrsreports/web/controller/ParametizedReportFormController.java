@@ -1,6 +1,7 @@
 package org.openmrs.module.amrsreports.web.controller;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Cohort;
@@ -31,6 +32,7 @@ import org.openmrs.module.reporting.report.definition.ReportDefinition;
 import org.openmrs.module.reporting.report.definition.service.ReportDefinitionService;
 import org.openmrs.module.reporting.report.renderer.ExcelTemplateRenderer;
 import org.openmrs.util.OpenmrsUtil;
+import org.openmrs.web.WebConstants;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,6 +42,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -68,9 +71,32 @@ public class ParametizedReportFormController {
 	 * @throws Exception
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "adultsPersistence")
-	public void generateAdultsPersistence(HttpServletRequest request, HttpServletResponse response ) throws Exception {
+	public String generateAdultsPersistence(HttpSession httpSession, HttpServletRequest request, HttpServletResponse response ) throws Exception {
 
 		//Integer persistence = Integer.valueOf(request.getParameter("adultPersistencetimes"));
+
+		if (StringUtils.isEmpty(request.getParameter("adultPersistencetimes"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for persistence");
+
+			return "redirect:queuedParametizedReport.form";
+		}
+
+		if (StringUtils.isEmpty(request.getParameter("adt_maxcd4"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for max CD4!");
+
+			return "redirect:queuedParametizedReport.form";
+		}
+
+		if (StringUtils.isEmpty(request.getParameter("adt_noOfMonths"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for no of months");
+			return "redirect:queuedParametizedReport.form";
+		}
+
+		if (StringUtils.isEmpty(request.getParameter("evaluationDate"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set start date");
+			return "redirect:queuedParametizedReport.form";
+		}
+
 		Double maxCd4 = Double.valueOf(request.getParameter("adt_maxcd4"));
 		Integer no_of_months = Integer.valueOf(request.getParameter("adt_noOfMonths"));
 		String effectiveDate = request.getParameter("evaluationDate");
@@ -125,11 +151,13 @@ public class ParametizedReportFormController {
 			excelFileDownload.flush();
 			excelFileDownload.close();
 			xlsFile.delete();
+
 		}  catch (Exception e){
 			//e.getMessage();
 			e.printStackTrace();
 			throw new RuntimeException("There was a problem running this report!!!!" + e);
 		}
+		return "redirect:queuedParametizedReport.form";
 	}
 
 
@@ -140,10 +168,19 @@ public class ParametizedReportFormController {
 	 * @throws Exception
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "adultCd4DropBelowPreTreatmentReport")
-	public void adultCd4DropBelowPreTreatmentBaseline(HttpServletRequest request, HttpServletResponse response ) throws Exception {
+	public String adultCd4DropBelowPreTreatmentBaseline(HttpSession httpSession, HttpServletRequest request, HttpServletResponse response ) throws Exception {
 
-		Integer persistence = Integer.valueOf(request.getParameter("adultPersistencetimes"));
-		Double maxCd4 = Double.valueOf(request.getParameter("adt_maxcd4"));
+		if (StringUtils.isEmpty(request.getParameter("adult_cd4_below_pretreatment_no_of_months"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for no of months");
+			return "redirect:queuedParametizedReport.form";
+		}
+
+		if (StringUtils.isEmpty(request.getParameter("evaluationDate"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set start date");
+			return "redirect:queuedParametizedReport.form";
+		}
+
+		Double maxCd4 = Double.valueOf(200);
 		Integer no_of_months = Integer.valueOf(request.getParameter("adult_cd4_below_pretreatment_no_of_months"));
 		String effectiveDate = request.getParameter("evaluationDate");
 
@@ -199,7 +236,7 @@ public class ParametizedReportFormController {
 			e.getMessage();
 			//e.printStackTrace();
 		}
-
+		return "redirect:queuedParametizedReport.form";
 	}
 
 	/**
@@ -209,7 +246,17 @@ public class ParametizedReportFormController {
 	 * @throws Exception
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "adultsCd4DropPercentage")
-	public void adultPercCd4DropBelowPreTreatmentBaseline(HttpServletRequest request, HttpServletResponse response ) throws Exception {
+	public String adultPercCd4DropBelowPreTreatmentBaseline(HttpSession httpSession, HttpServletRequest request, HttpServletResponse response ) throws Exception {
+
+		if (StringUtils.isEmpty(request.getParameter("adult_perc_cd4drop_param"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for CD4 % Drop");
+			return "redirect:queuedParametizedReport.form";
+		}
+
+		if (StringUtils.isEmpty(request.getParameter("evaluationDate"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set start date");
+			return "redirect:queuedParametizedReport.form";
+		}
 
 		Integer adult_perc_cd4_baseline = Integer.valueOf(request.getParameter("adult_perc_cd4drop_param"));
 		String effectiveDate = request.getParameter("evaluationDate");
@@ -267,7 +314,7 @@ public class ParametizedReportFormController {
 			e.getMessage();
 			//e.printStackTrace();
 		}
-
+		return "redirect:queuedParametizedReport.form";
 	}
 
 	//================================================= peds treatment failure reports ============================================================
@@ -279,7 +326,30 @@ public class ParametizedReportFormController {
 	 * @throws Exception
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "ped_tf_rpt1")
-	public void ped_tf_rpt1(HttpServletRequest request, HttpServletResponse response ) throws Exception {
+	public String ped_tf_rpt1(HttpSession httpSession, HttpServletRequest request, HttpServletResponse response ) throws Exception {
+
+		if (StringUtils.isEmpty(request.getParameter("ped_tf_rpt1_min_age"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for min age in months");
+			return "redirect:queuedParametizedReport.form";
+		}
+		if (StringUtils.isEmpty(request.getParameter("ped_tf_rpt1_max_age"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for max age in months");
+			return "redirect:queuedParametizedReport.form";
+		}
+		if (StringUtils.isEmpty(request.getParameter("ped_tf_rpt1_max_cd4"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for max CD4");
+			return "redirect:queuedParametizedReport.form";
+		}
+		if (StringUtils.isEmpty(request.getParameter("ped_tf_rpt1_months"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for no of months after initiation");
+			return "redirect:queuedParametizedReport.form";
+		}
+
+
+		if (StringUtils.isEmpty(request.getParameter("evaluationDate"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set start date");
+			return "redirect:queuedParametizedReport.form";
+		}
 
 		Integer ped_tf_rpt1_min_age = Integer.valueOf(request.getParameter("ped_tf_rpt1_min_age"));
 		Integer ped_tf_rpt1_max_age = Integer.valueOf(request.getParameter("ped_tf_rpt1_max_age"));
@@ -343,7 +413,7 @@ public class ParametizedReportFormController {
 			e.getMessage();
 			//e.printStackTrace();
 		}
-
+		return "redirect:queuedParametizedReport.form";
 	}
 
 	/**
@@ -353,7 +423,24 @@ public class ParametizedReportFormController {
 	 * @throws Exception
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "ped_tf_rpt2")
-	public void ped_tf_rpt2(HttpServletRequest request, HttpServletResponse response ) throws Exception {
+	public String ped_tf_rpt2(HttpSession httpSession, HttpServletRequest request, HttpServletResponse response ) throws Exception {
+
+		if (StringUtils.isEmpty(request.getParameter("ped_tf_rpt2_min_age"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for min age");
+			return "redirect:queuedParametizedReport.form";
+		}
+		if (StringUtils.isEmpty(request.getParameter("ped_tf_rpt2_max_cd4"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for max CD4");
+			return "redirect:queuedParametizedReport.form";
+		}
+		if (StringUtils.isEmpty(request.getParameter("ped_tf_rpt2_months"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for months after initiation");
+			return "redirect:queuedParametizedReport.form";
+		}
+		if (StringUtils.isEmpty(request.getParameter("evaluationDate"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set start date");
+			return "redirect:queuedParametizedReport.form";
+		}
 
 		Integer ped_tf_rpt2_min_age = Integer.valueOf(request.getParameter("ped_tf_rpt2_min_age"));
 		Double ped_tf_rpt2_max_cd4 = Double.valueOf(request.getParameter("ped_tf_rpt2_max_cd4"));
@@ -413,7 +500,7 @@ public class ParametizedReportFormController {
 			e.getMessage();
 			e.printStackTrace();
 		}
-
+		return "redirect:queuedParametizedReport.form";
 	}
 
 
@@ -424,7 +511,17 @@ public class ParametizedReportFormController {
 	 * @throws Exception
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "ped_tf_rpt3")
-	public void ped_tf_rpt3(HttpServletRequest request, HttpServletResponse response ) throws Exception {
+	public String ped_tf_rpt3(HttpSession httpSession, HttpServletRequest request, HttpServletResponse response ) throws Exception {
+
+		if (StringUtils.isEmpty(request.getParameter("ped_tf_rpt3_months"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for months after initiation");
+			return "redirect:queuedParametizedReport.form";
+		}
+
+		if (StringUtils.isEmpty(request.getParameter("evaluationDate"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set start date");
+			return "redirect:queuedParametizedReport.form";
+		}
 
 		Integer ped_tf_rpt3_months = Integer.valueOf(request.getParameter("ped_tf_rpt3_months"));
 		String effectiveDate = request.getParameter("evaluationDate");
@@ -482,7 +579,7 @@ public class ParametizedReportFormController {
 			e.getMessage();
 			e.printStackTrace();
 		}
-
+		return "redirect:queuedParametizedReport.form";
 	}
 
 
@@ -495,7 +592,17 @@ public class ParametizedReportFormController {
 	 * @throws Exception
 	 */
 	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "ped_tf_rpt4")
-	public void ped_tf_rpt4(HttpServletRequest request, HttpServletResponse response ) throws Exception {
+	public String ped_tf_rpt4(HttpSession httpSession, HttpServletRequest request, HttpServletResponse response ) throws Exception {
+
+		if (StringUtils.isEmpty(request.getParameter("ped_tf_rpt4_cd4_perc"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for CD4 drop level");
+			return "redirect:queuedParametizedReport.form";
+		}
+
+		if (StringUtils.isEmpty(request.getParameter("evaluationDate"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set start date");
+			return "redirect:queuedParametizedReport.form";
+		}
 
 		Integer ped_tf_rpt4_cd4_perc = Integer.valueOf(request.getParameter("ped_tf_rpt4_cd4_perc"));
 		String effectiveDate = request.getParameter("evaluationDate");
@@ -553,7 +660,7 @@ public class ParametizedReportFormController {
 			e.getMessage();
 			e.printStackTrace();
 		}
-
+		return "redirect:queuedParametizedReport.form";
 	}
 
 
@@ -561,8 +668,17 @@ public class ParametizedReportFormController {
 	//================================================ end of peds treatment failure reports
 
 	@RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "childrenNotInHaartReport")
-	public void childrenNotInHaartIrrespectiveOfCD4Count(HttpServletRequest request, HttpServletResponse response ) throws Exception {
+	public String childrenNotInHaartIrrespectiveOfCD4Count(HttpSession httpSession, HttpServletRequest request, HttpServletResponse response ) throws Exception {
 
+		if (StringUtils.isEmpty(request.getParameter("childrenNotInHaartAgeInM"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for age");
+			return "redirect:queuedParametizedReport.form";
+		}
+
+		if (StringUtils.isEmpty(request.getParameter("evaluationDate"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set start date");
+			return "redirect:queuedParametizedReport.form";
+		}
         Integer maxAge = Integer.valueOf(request.getParameter("childrenNotInHaartAgeInM"));
         String effectiveDate = request.getParameter("evaluationDate");
 
@@ -617,17 +733,29 @@ public class ParametizedReportFormController {
 			e.printStackTrace();
         }
 
-
-
-        //================================
-
-		//httpSession.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Please wait as the report is processed." + persistencetimes + " ==" + effectiveDate);
-
-		//return SUCCESS_VIEW;
+		return "redirect:queuedParametizedReport.form";
 	}
 
     @RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "childrenCD4MReport")
-    public void childrenCD4NotInHAARTM(HttpServletRequest request, HttpServletResponse response ) throws Exception {
+    public String childrenCD4NotInHAARTM(HttpSession httpSession, HttpServletRequest request, HttpServletResponse response ) throws Exception {
+
+		if (StringUtils.isEmpty(request.getParameter("childrenMinAgeM"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for min age");
+			return "redirect:queuedParametizedReport.form";
+		}
+		if (StringUtils.isEmpty(request.getParameter("childrenMaxAgeM"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for max age");
+			return "redirect:queuedParametizedReport.form";
+		}
+		if (StringUtils.isEmpty(request.getParameter("childrenMaxCD4M"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for max CD4");
+			return "redirect:queuedParametizedReport.form";
+		}
+
+		if (StringUtils.isEmpty(request.getParameter("evaluationDate"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set start date");
+			return "redirect:queuedParametizedReport.form";
+		}
 
         Integer minAge = Integer.valueOf(request.getParameter("childrenMinAgeM"));
         Integer maxAge = Integer.valueOf(request.getParameter("childrenMaxAgeM"));
@@ -691,12 +819,28 @@ public class ParametizedReportFormController {
 			e.printStackTrace();
         }
 
-
+		return "redirect:queuedParametizedReport.form";
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "childrenCD4YReport")
-    public void childrenCD4NotInHAARTY(HttpServletRequest request, HttpServletResponse response ) throws Exception {
+    public String childrenCD4NotInHAARTY(HttpSession httpSession, HttpServletRequest request, HttpServletResponse response ) throws Exception {
 
+		if (StringUtils.isEmpty(request.getParameter("childrenMinAgeY"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for min age");
+			return "redirect:queuedParametizedReport.form";
+		}
+		if (StringUtils.isEmpty(request.getParameter("childrenMaxAgeY"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for max age");
+			return "redirect:queuedParametizedReport.form";
+		}
+		if (StringUtils.isEmpty(request.getParameter("childrenMaxCD4Y"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for max CD4");
+			return "redirect:queuedParametizedReport.form";
+		}
+		if (StringUtils.isEmpty(request.getParameter("evaluationDate"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set start date");
+			return "redirect:queuedParametizedReport.form";
+		}
         Integer minAge = Integer.valueOf(request.getParameter("childrenMinAgeY"));
         Integer maxAge = Integer.valueOf(request.getParameter("childrenMaxAgeY"));
         Double maxCd4Count = Double.valueOf(request.getParameter("childrenMaxCD4Y"));
@@ -757,12 +901,21 @@ public class ParametizedReportFormController {
 			e.getMessage();
 			e.printStackTrace();
         }
+		return "redirect:queuedParametizedReport.form";
 
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "childrenLatestCD4Report")
-    public void childrenLatestCD4Report( HttpServletRequest request, HttpServletResponse response ) throws Exception {
+    public String childrenLatestCD4Report(HttpSession httpSession, HttpServletRequest request, HttpServletResponse response ) throws Exception {
 
+		if (StringUtils.isEmpty(request.getParameter("childrenLatestCD4"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for duration");
+			return "redirect:queuedParametizedReport.form";
+		}
+		if (StringUtils.isEmpty(request.getParameter("evaluationDate"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set start date");
+			return "redirect:queuedParametizedReport.form";
+		}
         Integer period = Integer.valueOf(request.getParameter("childrenLatestCD4"));
         String effectiveDate = request.getParameter("evaluationDate");
 
@@ -824,12 +977,21 @@ public class ParametizedReportFormController {
 			e.getMessage();
 			e.printStackTrace();
         }
+		return "redirect:queuedParametizedReport.form";
 
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "adultsLatestCD4Report")
-    public void adultsLatestCD4Report( HttpServletRequest request, HttpServletResponse response ) throws Exception {
+    public String adultsLatestCD4Report(HttpSession httpSession, HttpServletRequest request, HttpServletResponse response ) throws Exception {
 
+		if (StringUtils.isEmpty(request.getParameter("adultsLatestCD4"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for duration");
+			return "redirect:queuedParametizedReport.form";
+		}
+		if (StringUtils.isEmpty(request.getParameter("evaluationDate"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set start date");
+			return "redirect:queuedParametizedReport.form";
+		}
         Integer period = Integer.valueOf(request.getParameter("adultsLatestCD4"));
         String effectiveDate = request.getParameter("evaluationDate");
 
@@ -891,6 +1053,7 @@ public class ParametizedReportFormController {
 			e.getMessage();
 			e.printStackTrace();
         }
+		return "redirect:queuedParametizedReport.form";
 
     }
 
@@ -958,8 +1121,16 @@ public class ParametizedReportFormController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "module/amrsreports/queuedParametizedReport.form", params = "adultPatientsNotOnART")
-    public void adultPatientsNotOnART( HttpServletRequest request, HttpServletResponse response ) throws Exception {
+    public String adultPatientsNotOnART(HttpSession httpSession, HttpServletRequest request, HttpServletResponse response ) throws Exception {
 
+		if (StringUtils.isEmpty(request.getParameter("adultsMaxCD4noPreg"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set value for max CD4");
+			return "redirect:queuedParametizedReport.form";
+		}
+		if (StringUtils.isEmpty(request.getParameter("evaluationDate"))){
+			httpSession.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "You did not set start date");
+			return "redirect:queuedParametizedReport.form";
+		}
         String effectiveDate = request.getParameter("evaluationDate");
         Double maxCD4 = Double.valueOf(request.getParameter("adultsMaxCD4noPreg"));
 
@@ -1019,7 +1190,7 @@ public class ParametizedReportFormController {
 			e.getMessage();
 			e.printStackTrace();
         }
-
+		return "redirect:queuedParametizedReport.form";
     }
 
 

@@ -46,27 +46,6 @@
         evaluationEndDate = new DatePicker("<openmrs:datePattern/>", "reportingEndDate", { });
         evaluationEndDate.setDate(new Date());
 
-
-
-        $j("#adultcd4report").click(function(){
-            var startDate = String($j("#evaluationDate").val());
-            var maxMonths = $j("#adultsMaxMonths").val();
-
-            DWRAmrsReportService.saveAdultsCd4DoneMoreThan6Months(startDate,maxMonths,function(mapResult){
-                alert("It is trying to download");
-            });
-
-
-        });
-
-       /* $j("#testbutton").click(function(){
-            DWRAmrsReportService.testReportDownload(function(mapResult){
-                alert("It is trying to download");
-            });
-
-
-        });*/
-
     });
 
 </script>
@@ -81,7 +60,7 @@
         <br/>
     </spring:hasBindErrors>
 
-    <form method="POST">
+    <form method="POST" id="rpt">
         <fieldset class="visualPadding">
             <table cellpadding="2" cellspacing="0">
                 <tr>
@@ -108,7 +87,7 @@
                 </tr>
                 <tr>
                     <td colspan="2">
-                        Persistent ( <input type="text" name="adultPersistencetimes" id="adultPersistencetimes" size="4" /> or more ) CD4 counts less than <input type="text" name="adt_maxcd4" id="adt_maxcd4" size="4" /> , <input type="text" name="adt_noOfMonths" id="adt_noOfMonths" size="4" /> months or more after initiation of HAART &nbsp;&nbsp;&nbsp;&nbsp;<input type="submit" name="adultsPersistence" id="adultsPersistence" value="  +  " />
+                        Persistent ( <input type="text" name="adultPersistencetimes" id="adultPersistencetimes" size="4" /> or more ) CD4 counts less than <input type="text" name="adt_maxcd4" id="adt_maxcd4" size="4" /> , <input type="text" name="adt_noOfMonths" id="adt_noOfMonths" size="4" /> months or more after initiation of HAART &nbsp;&nbsp;&nbsp;&nbsp;<input type="submit"  name="adultsPersistence" id="adultsPersistence" value="  +  " />
                     </td>
                 </tr>
                 <tr>
